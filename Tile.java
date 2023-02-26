@@ -1,12 +1,15 @@
 import java.util.Random;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ImageObserver;
 import java.awt.Color;
-import java.awt.Font;
 
 public class Tile extends JPanel {
     
@@ -19,10 +22,13 @@ public class Tile extends JPanel {
     public void setPiece(ChessPiece piece) { this.piece = piece; }
     public boolean getisEmpty() { return isEmpty; }
     public void setEmpty(boolean isEmpty) { this.isEmpty = isEmpty; }
+    public Color getTileColor() { return tileColor; }
+    public void setTileColor(Color tileColor) { this.tileColor = tileColor; }
 
     public Tile(ChessPiece pieceIn, Color tileColorIn) {
         setLayout(null); // Allows button in panel to be any size it wants to be
-        
+        setPiece(pieceIn);
+        setTileColor(tileColorIn);
         /* Creates an invisible button. This allows the user to
         replace the shape with a face by clicking the shape. */
         changeTileButton = new JButton();
@@ -32,22 +38,17 @@ public class Tile extends JPanel {
         changeTileButton.setContentAreaFilled(false);
         changeTileButton.setBorderPainted(false);
 
+        if (!piece.getType().equals("Empty")) {
+            changeTileButton.setIcon(pieceIn.getPieceImage());
+        }
+
         add(changeTileButton);
 
-        JLabel pieceLabel = new JLabel(pieceIn.getPieceImage());
-        add(pieceLabel);
-
-        // When clicked, the clickCount is incremented and the shape is painted again.
-        // When the clickCount is odd, a face is shown in place of the shape.
         changeTileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-               repaint();
+                repaint();
             }
         });
-    }
-
-    public Tile() {
-        setEmpty(true);
     }
 
     public void paintComponent(Graphics g) {

@@ -4,12 +4,19 @@ public class Pawn extends ChessPiece {
 
     public Pawn(String rookColor) {
         super(rookColor);
+        setColor(rookColor);
+        setType("Pawn");
 
-        setType("Rook");
+        switch(rookColor) {
+            case "Black":
+                setPieceImage(new ImageIcon("blackPawn.png"));
+                break;
 
-        setPieceImage(new ImageIcon(getClass().getResource("blackPawn.svg")));
+            case "White":
+                setPieceImage(new ImageIcon("whitePawn.png"));
+                break;
+        }
     }
 
-    public void movePiece(ChessPiece[][] chessBoard) {
-    }
+    public void movePiece(ChessPiece[][] chessBoard) {}
 }

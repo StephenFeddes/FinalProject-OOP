@@ -1,0 +1,1 @@
+# Credit to Free SVG for the chess icons

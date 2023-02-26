@@ -2,14 +2,21 @@ import javax.swing.ImageIcon;
 
 public class Queen extends ChessPiece {
 
-    public Queen(String rookColor) {
+    public  Queen(String rookColor) {
         super(rookColor);
+        setColor(rookColor);
+        setType("Queen");
 
-        setType("Rook");
+        switch(rookColor) {
+            case "Black":
+                setPieceImage(new ImageIcon("blackQueen.png"));
+                break;
 
-        setPieceImage(new ImageIcon(getClass().getResource("blackPawn.svg")));
+            case "White":
+                setPieceImage(new ImageIcon("whiteQueen.png"));
+                break;
+        }
     }
 
-    public void movePiece(ChessPiece[][] chessBoard) {
-    }
+    public void movePiece(ChessPiece[][] chessBoard) {}
 }

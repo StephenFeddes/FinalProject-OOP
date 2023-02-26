@@ -4,12 +4,19 @@ public class Rook extends ChessPiece {
 
     public Rook(String rookColor) {
         super(rookColor);
-
+        setColor(rookColor);
         setType("Rook");
 
-        setPieceImage(new ImageIcon(getClass().getResource("blackPawn.svg")));
+        switch(rookColor) {
+            case "Black":
+                setPieceImage(new ImageIcon("blackRook.png"));
+                break;
+
+            case "White":
+                setPieceImage(new ImageIcon("whiteRook.png"));
+                break;
+        }
     }
 
-    public void movePiece(ChessPiece[][] chessBoard) {
-    }
+    public void movePiece(ChessPiece[][] chessBoard) {}
 }

@@ -1,7 +1,7 @@
 import javax.swing.ImageIcon;
 
 public abstract class ChessPiece {
-    private String type;
+    public String type;
     private String color;
     private ImageIcon pieceImage;
     
@@ -16,6 +16,8 @@ public abstract class ChessPiece {
     public ChessPiece(String pieceColor) {
         setColor(pieceColor);
     }
+
+    public ChessPiece() {}
 
     abstract void movePiece(ChessPiece[][] chessBoard);
 }

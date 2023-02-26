@@ -4,12 +4,19 @@ public class Bishop extends ChessPiece {
 
     public Bishop(String rookColor) {
         super(rookColor);
+        setColor(rookColor);
+        setType("Bishop");
 
-        setType("Rook");
+        switch(rookColor) {
+            case "Black":
+                setPieceImage(new ImageIcon("blackBishop.png"));
+                break;
 
-        setPieceImage(new ImageIcon(getClass().getResource("blackPawn.svg")));
+            case "White":
+                setPieceImage(new ImageIcon("whiteBishop.png"));
+                break;
+        }
     }
 
-    public void movePiece(ChessPiece[][] chessBoard) {
-    }
+    public void movePiece(ChessPiece[][] chessBoard) {}
 }
