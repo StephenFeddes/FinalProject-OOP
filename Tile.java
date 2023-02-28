@@ -13,16 +13,23 @@ import java.awt.Color;
 
 public class Tile extends JPanel {
     
-    private JButton changeTileButton;
+    private JButton tileButton;
     private ChessPiece piece;
     private boolean isEmpty;
     private Color tileColor;
+    private int rowCoordinate;
+    private int colCoordinate;
 
     public ChessPiece getPiece() { return piece; }
-    public void setPiece(ChessPiece piece) { this.piece = piece; }
     public boolean getisEmpty() { return isEmpty; }
-    public void setEmpty(boolean isEmpty) { this.isEmpty = isEmpty; }
     public Color getTileColor() { return tileColor; }
+    public int getRowCoordinate() { return rowCoordinate; }
+    public int getColCoordinate() { return colCoordinate; }
+
+    public void setRowCoordinate(int rowCoordinate) { this.rowCoordinate = rowCoordinate; }
+    public void setColCoordinate(int colCoordinate) { this.colCoordinate = colCoordinate; }
+    public void setPiece(ChessPiece piece) { this.piece = piece; }
+    public void setEmpty(boolean isEmpty) { this.isEmpty = isEmpty; }
     public void setTileColor(Color tileColor) { this.tileColor = tileColor; }
 
     public Tile(ChessPiece pieceIn, Color tileColorIn) {
@@ -31,22 +38,28 @@ public class Tile extends JPanel {
         setTileColor(tileColorIn);
         /* Creates an invisible button. This allows the user to
         replace the shape with a face by clicking the shape. */
-        changeTileButton = new JButton();
+        tileButton = new JButton();
         
         // Makes button invisible.
-        changeTileButton.setOpaque(false);
-        changeTileButton.setContentAreaFilled(false);
-        changeTileButton.setBorderPainted(false);
+        tileButton.setOpaque(false);
+        tileButton.setContentAreaFilled(false);
+        tileButton.setBorderPainted(false);
 
         if (!piece.getType().equals("Empty")) {
-            changeTileButton.setIcon(pieceIn.getPieceImage());
+            tileButton.setIcon(pieceIn.getPieceImage());
         }
 
-        add(changeTileButton);
+        add(tileButton);
 
-        changeTileButton.addActionListener(new ActionListener() {
+        tileButton.addActionListener(new ChessController());
+
+        tileButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                repaint();
+                tileButton.removeActionListener(new ChessController());
+                ChessController.tileCoordinates[0] = getRowCoordinate();
+                ChessController.tileCoordinates[1] = getColCoordinate();
+                tileButton.addActionListener(new ChessController());
             }
         });
     }
@@ -58,6 +71,6 @@ public class Tile extends JPanel {
         g.fillRect(0,0, getWidth(), getHeight());
 
         // Sets size of the invisible button so it covers the entire shape
-        changeTileButton.setSize(getWidth(), getHeight());
+        tileButton.setSize(getWidth(), getHeight());
     }
 }
