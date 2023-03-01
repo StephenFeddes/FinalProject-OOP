@@ -2,12 +2,12 @@ import javax.swing.ImageIcon;
 
 public class Bishop extends ChessPiece {
 
-    public Bishop(String rookColor) {
-        super(rookColor);
-        setColor(rookColor);
-        setType("Bishop");
+    public Bishop(String bishopColor) {
+        super(bishopColor);
+        setPieceColor(bishopColor);
+        setPieceType("Bishop");
 
-        switch(rookColor) {
+        switch(bishopColor) {
             case "Black":
                 setPieceImage(new ImageIcon("blackBishop.png"));
                 break;

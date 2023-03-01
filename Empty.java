@@ -1,7 +1,7 @@
 public class Empty extends ChessPiece {
 
     public Empty() {
-        setType("Empty");
+        setPieceType("Empty");
     }
 
         public void movePiece(ChessPiece[][] chessBoard) {}

@@ -2,12 +2,12 @@ import javax.swing.ImageIcon;
 
 public class Pawn extends ChessPiece {
 
-    public Pawn(String rookColor) {
-        super(rookColor);
-        setColor(rookColor);
-        setType("Pawn");
+    public Pawn(String pawnColor) {
+        super(pawnColor);
+        setPieceColor(pawnColor);
+        setPieceType("Pawn");
 
-        switch(rookColor) {
+        switch(pawnColor) {
             case "Black":
                 setPieceImage(new ImageIcon("blackPawn.png"));
                 break;

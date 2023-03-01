@@ -15,21 +15,19 @@ public class Tile extends JPanel {
     
     private JButton tileButton;
     private ChessPiece piece;
-    private boolean isEmpty;
     private Color tileColor;
     private int rowCoordinate;
     private int colCoordinate;
 
     public ChessPiece getPiece() { return piece; }
-    public boolean getisEmpty() { return isEmpty; }
     public Color getTileColor() { return tileColor; }
     public int getRowCoordinate() { return rowCoordinate; }
     public int getColCoordinate() { return colCoordinate; }
+    public JButton getTileButton() { return tileButton; }
 
     public void setRowCoordinate(int rowCoordinate) { this.rowCoordinate = rowCoordinate; }
     public void setColCoordinate(int colCoordinate) { this.colCoordinate = colCoordinate; }
     public void setPiece(ChessPiece piece) { this.piece = piece; }
-    public void setEmpty(boolean isEmpty) { this.isEmpty = isEmpty; }
     public void setTileColor(Color tileColor) { this.tileColor = tileColor; }
 
     public Tile(ChessPiece pieceIn, Color tileColorIn) {
@@ -45,23 +43,11 @@ public class Tile extends JPanel {
         tileButton.setContentAreaFilled(false);
         tileButton.setBorderPainted(false);
 
-        if (!piece.getType().equals("Empty")) {
+        if (!piece.getPieceType().equals("Empty")) {
             tileButton.setIcon(pieceIn.getPieceImage());
         }
 
         add(tileButton);
-
-        tileButton.addActionListener(new ChessController());
-
-        tileButton.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                tileButton.removeActionListener(new ChessController());
-                ChessController.tileCoordinates[0] = getRowCoordinate();
-                ChessController.tileCoordinates[1] = getColCoordinate();
-                tileButton.addActionListener(new ChessController());
-            }
-        });
     }
 
     public void paintComponent(Graphics g) {

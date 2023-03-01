@@ -6,26 +6,39 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class ChessController implements ActionListener {
+public class ChessController {
     
     private ChessView theView;
     private ChessModel theModel;
-    public static int[] tileCoordinates = new int[2];
 
     public ChessController(ChessView theView, ChessModel theModel) {
 
         this.theView = theView;
         this.theModel = theModel;
 
+        this.theView.addMoveListener(new MoveListener());
     }
 
-    public ChessController() {
+    class MoveListener implements ActionListener {
+
+        int[] selectedTileCoordinates;
+
+        public void actionPerformed(ActionEvent e) {
+
+            //System.out.println(theView.getTileCoordinates()[0]);
+            //System.out.println(theView.getTileCoordinates()[1]);
+
+            selectedTileCoordinates = theView.getTileCoordinates();
+
+            theModel.addMove(selectedTileCoordinates);
+
+            //System.out.println(theModel.getDisplayIsReady());
+
+            if (theModel.getDisplayIsReady()) {
+            theView.setBoard(theModel.getBoard());
+            }
+        }
     }
-
-    public void actionPerformed(ActionEvent e) {
-        System.out.println(tileCoordinates[0]);
-        System.out.println(tileCoordinates[1]);
-    }
-
-
 }
+
+

@@ -6,15 +6,15 @@ public abstract class ChessPiece {
     private ImageIcon pieceImage;
     
     public ImageIcon getPieceImage() {return pieceImage; };
-    public String getType() { return type; }
-    public String getColor() { return color; }
+    public String getPieceType() { return type; }
+    public String getPieceColor() { return color; }
 
     public void setPieceImage(ImageIcon pieceImage) { this.pieceImage = pieceImage; }
-    public void setType(String pieceType) { this.type = pieceType; }
-    public void setColor(String pieceColor) { this.color = pieceColor; }
+    public void setPieceType(String pieceType) { this.type = pieceType; }
+    public void setPieceColor(String pieceColor) { this.color = pieceColor; }
 
     public ChessPiece(String pieceColor) {
-        setColor(pieceColor);
+        setPieceColor(pieceColor);
     }
 
     public ChessPiece() {}

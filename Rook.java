@@ -4,8 +4,8 @@ public class Rook extends ChessPiece {
 
     public Rook(String rookColor) {
         super(rookColor);
-        setColor(rookColor);
-        setType("Rook");
+        setPieceColor(rookColor);
+        setPieceType("Rook");
 
         switch(rookColor) {
             case "Black":
