@@ -17,6 +17,7 @@ public class ChessView extends JFrame {
     private final int BOARD_SIZE = 8;
     private ArrayList<Tile> tileList = new ArrayList<Tile>();
     private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+    private ArrayList<int[]> availableTilesList = new ArrayList<int[]>();
     private JPanel boardPanel = new JPanel();
     private int[] tileCoordinates = new int[2];
     ActionListener listenerForBoardClick;
@@ -25,49 +26,56 @@ public class ChessView extends JFrame {
     public ChessPiece[][] getBoard() { return board; }
     public int[] getTileCoordinates() { return tileCoordinates; }
 
-    public void setBoard(ChessPiece[][] boardIn) { 
+    public void displayBoard(ChessPiece[][] boardIn) { 
 
         this.remove(boardPanel);
         this.remove(contentPane);
+        tileList.clear();
         boardPanel = new JPanel();
+        
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(boardPanel, BorderLayout.CENTER);
         boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
         
-        Tile newTile;
         Color tileColor;
+        Tile newTile;
         for (int row=0; row < BOARD_SIZE; row++) {
             for(int col=0; col < BOARD_SIZE; col++) {
 
                 if (row%2 == 0) {
                     if (col%2 == 0) {
-                        tileColor = Color.ORANGE;
+                        tileColor = new Color(200,200,150);
                     } else {
-                        tileColor = Color.RED;
+                        tileColor = new Color(100,150,100);
                     }
                 } else {
                     if (col%2 == 0) {
-                        tileColor = Color.RED;
+                        tileColor = new Color(100,150,100);
                     } else {
-                        tileColor = Color.ORANGE;
+                        tileColor = new Color(200,200,150);
                     }
                 }
 
+                for (int[] availableTileCoordinates : availableTilesList) {
 
+                    if (availableTileCoordinates[0]==row && availableTileCoordinates[1]==col) {
+                        tileColor = new Color(125,200,125);
+                    }
+                }
 
                 newTile = new Tile(boardIn[row][col], tileColor);
-
                 newTile.setRowCoordinate(row);
                 newTile.setColCoordinate(col);
 
-                newAddMoveListener(newTile);
-
+                tileList.add(newTile);
                 boardPanel.add(newTile);
             }
         }
 
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(boardPanel, BorderLayout.CENTER);
-
+        for (Tile tile : tileList) {
+            addMoveListener(tile);
+        }
+    
         SwingUtilities.updateComponentTreeUI(this);
     }
 
@@ -77,45 +85,10 @@ public class ChessView extends JFrame {
         setBounds(0,0,518,535);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        displayBoard();
+        displayBoard(board);
     }
 
-    public void displayBoard() {
-
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(boardPanel, BorderLayout.CENTER);
-        boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
-        
-        Color tileColor;
-        Tile newTile;
-        for (int row=0; row < BOARD_SIZE; row++) {
-            for(int col=0; col < BOARD_SIZE; col++) {
-
-                if (row%2 == 0) {
-                    if (col%2 == 0) {
-                        tileColor = Color.ORANGE;
-                    } else {
-                        tileColor = Color.RED;
-                    }
-                } else {
-                    if (col%2 == 0) {
-                        tileColor = Color.RED;
-                    } else {
-                        tileColor = Color.ORANGE;
-                    }
-                }
-
-                newTile = new Tile(board[row][col], tileColor);
-                newTile.setRowCoordinate(row);
-                newTile.setColCoordinate(col);
-
-                tileList.add(newTile);
-                boardPanel.add(newTile);
-            }
-        }
-    }
-
-    public void newAddMoveListener(Tile tileIn) {
+    public void addMoveListener(Tile tileIn) {
 
         tileIn.getTileButton().addActionListener(listenerForBoardClick);
 

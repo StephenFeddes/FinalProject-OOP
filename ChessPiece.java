@@ -1,4 +1,6 @@
 import javax.swing.ImageIcon;
+import java.awt.Color;
+import java.util.ArrayList;
 
 public abstract class ChessPiece {
     public String type;
@@ -19,5 +21,5 @@ public abstract class ChessPiece {
 
     public ChessPiece() {}
 
-    abstract void movePiece(ChessPiece[][] chessBoard);
+    abstract ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates);
 }

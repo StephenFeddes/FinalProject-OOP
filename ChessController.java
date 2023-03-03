@@ -35,7 +35,7 @@ public class ChessController {
             //System.out.println(theModel.getDisplayIsReady());
 
             if (theModel.getDisplayIsReady()) {
-            theView.setBoard(theModel.getBoard());
+            theView.displayBoard(theModel.getBoard());
             }
         }
     }

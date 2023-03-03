@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 
 public class Rook extends ChessPiece {
@@ -9,14 +11,19 @@ public class Rook extends ChessPiece {
 
         switch(rookColor) {
             case "Black":
-                setPieceImage(new ImageIcon("blackRook.png"));
+                setPieceImage(new ImageIcon("ChessPieces/blackRook.png"));
                 break;
 
             case "White":
-                setPieceImage(new ImageIcon("whiteRook.png"));
+                setPieceImage(new ImageIcon("ChessPieces/whiteRook.png"));
                 break;
         }
     }
 
-    public void movePiece(ChessPiece[][] chessBoard) {}
+    public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {
+
+        ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
+
+        return possibleNextLocations;
+        }
 }

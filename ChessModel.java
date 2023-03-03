@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.awt.Color;
 
 public class ChessModel {
 
@@ -6,6 +8,7 @@ public class ChessModel {
     private int movesIndex = 0;
     private int[][] moves = new int[2][2];
     private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+    private ArrayList<int[]> currentPossibleMovesList = new ArrayList<int[]>();
     private boolean displayIsReady = false;
 
     public ChessPiece[][] getBoard() { return board; }
@@ -19,19 +22,39 @@ public class ChessModel {
 
         moves[movesIndex] = selectionCoordinates.clone(); // Shallow copy
 
+        ChessPiece selectedPiece = board[moves[0][0]][moves[0][1]];
+
+        currentPossibleMovesList = selectedPiece.possibleMovesList(board, moves[0]);
+
+        boolean placementIsAcceptable = false;
         if (movesIndex == 1) {
 
-            board[moves[1][0]][moves[1][1]] = board[moves[0][0]][moves[0][1]];
+            for (int[] coordinates : selectedPiece.possibleMovesList(board, moves[0])) {
+                if (Arrays.equals(coordinates, moves[1])) {
+                    placementIsAcceptable = true;
+
+
+                }
+            }
+            movesIndex = -1;
+        } 
+
+        if (placementIsAcceptable) {
+
+            board[moves[1][0]][moves[1][1]] = selectedPiece;
 
             board[moves[0][0]][moves[0][1]] = new Empty();
+
+
 
             movesIndex = 0;
             displayIsReady = true;
         } else {
-            movesIndex = 1;
+            movesIndex+=1;
             displayIsReady = false;
         }
     }
+
 
     public static ChessPiece[][] initializeBoard() {
         final int BOARD_SIZE = 8;
