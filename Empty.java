@@ -4,6 +4,8 @@ public class Empty extends ChessPiece {
 
     public Empty() {
         setPieceType("Empty");
+        
+        setPieceColor("Null");
     }
 
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {

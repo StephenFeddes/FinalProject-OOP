@@ -10,9 +10,11 @@ public class ChessModel {
     private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
     private ArrayList<int[]> currentPossibleMovesList = new ArrayList<int[]>();
     private boolean displayIsReady = false;
+    private String currentTurn = "White";
 
     public ChessPiece[][] getBoard() { return board; }
     public boolean getDisplayIsReady() { return displayIsReady; }
+    public ArrayList<int[]> getCurrentPossibleMovesList() { return currentPossibleMovesList; }
 
     public ChessModel() {
         board = initializeBoard();
@@ -20,23 +22,24 @@ public class ChessModel {
 
     public void addMove(int[] selectionCoordinates) {
 
+        ChessPiece selectedPiece = new Empty();
+
         moves[movesIndex] = selectionCoordinates.clone(); // Shallow copy
 
-        ChessPiece selectedPiece = board[moves[0][0]][moves[0][1]];
-
-        currentPossibleMovesList = selectedPiece.possibleMovesList(board, moves[0]);
-
+        selectedPiece = board[moves[0][0]][moves[0][1]];
+    
         boolean placementIsAcceptable = false;
+
         if (movesIndex == 1) {
+
+            currentPossibleMovesList.clear();
 
             for (int[] coordinates : selectedPiece.possibleMovesList(board, moves[0])) {
                 if (Arrays.equals(coordinates, moves[1])) {
+
                     placementIsAcceptable = true;
-
-
                 }
             }
-            movesIndex = -1;
         } 
 
         if (placementIsAcceptable) {
@@ -45,13 +48,39 @@ public class ChessModel {
 
             board[moves[0][0]][moves[0][1]] = new Empty();
 
-
+            switch (currentTurn) {
+                case "White":
+                    currentTurn = "Black";
+                    break;
+    
+                case "Black":
+                    currentTurn = "White";
+                    break;
+            }
 
             movesIndex = 0;
-            displayIsReady = true;
-        } else {
-            movesIndex+=1;
-            displayIsReady = false;
+
+        } else if (selectedPiece.getPieceColor().equals(currentTurn) && movesIndex==0) {
+
+            currentPossibleMovesList = selectedPiece.possibleMovesList(board, moves[0]);
+            movesIndex = 1;
+
+        } else if (board[moves[1][0]][moves[1][1]].getPieceColor().equals(currentTurn)) {
+
+            currentPossibleMovesList.clear();
+
+            moves[0] = moves[1];
+
+            currentPossibleMovesList = board[moves[1][0]][moves[1][1]].possibleMovesList(board, moves[0]);
+
+            movesIndex = 1;
+        }
+        
+        else if (selectedPiece.getPieceColor().equals(currentTurn)) {
+
+            currentPossibleMovesList.clear();
+
+            currentPossibleMovesList = selectedPiece.possibleMovesList(board, moves[0]);
         }
     }
 

@@ -26,10 +26,22 @@ public class Pawn extends ChessPiece {
 
         ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
         
+        int direction = 1;
 
         int[] possibleCoordinates = new int[2];
 
-        possibleCoordinates[0] = pieceCoordinates[0] + 1;
+        switch (getPieceColor()) {
+            case "White":
+                direction = -1;
+                break;
+            
+            case "Black":
+                direction = 1;
+                break;
+        }
+
+
+        possibleCoordinates[0] = pieceCoordinates[0] + direction;
         possibleCoordinates[1] = pieceCoordinates[1];
 
         possibleNextLocations.add(possibleCoordinates.clone());

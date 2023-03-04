@@ -25,6 +25,8 @@ public class ChessView extends JFrame {
     
     public ChessPiece[][] getBoard() { return board; }
     public int[] getTileCoordinates() { return tileCoordinates; }
+    
+    public void setAvailableTilesList(ArrayList<int[]> currentAvailableTiles) { availableTilesList = currentAvailableTiles; }
 
     public void displayBoard(ChessPiece[][] boardIn) { 
 

@@ -25,18 +25,13 @@ public class ChessController {
 
         public void actionPerformed(ActionEvent e) {
 
-            //System.out.println(theView.getTileCoordinates()[0]);
-            //System.out.println(theView.getTileCoordinates()[1]);
-
             selectedTileCoordinates = theView.getTileCoordinates();
 
             theModel.addMove(selectedTileCoordinates);
 
-            //System.out.println(theModel.getDisplayIsReady());
+            theView.setAvailableTilesList(theModel.getCurrentPossibleMovesList());
 
-            if (theModel.getDisplayIsReady()) {
             theView.displayBoard(theModel.getBoard());
-            }
         }
     }
 }
