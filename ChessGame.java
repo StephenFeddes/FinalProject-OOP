@@ -9,6 +9,5 @@ public class ChessGame {
         ChessController theController = new ChessController(theView, theModel);
 
         theView.setVisible(true);
-
     }
 }

@@ -26,25 +26,63 @@ public class Pawn extends ChessPiece {
 
         ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
         
-        int direction = 1;
+        int moveDirection = 1;
 
         int[] possibleCoordinates = new int[2];
 
         switch (getPieceColor()) {
             case "White":
-                direction = -1;
+                moveDirection = -1;
                 break;
             
             case "Black":
-                direction = 1;
+                moveDirection = 1;
                 break;
         }
 
+        try {
+            ChessPiece pieceInFront1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1]];
+            if (pieceInFront1.getPieceType() == "Empty") {
 
-        possibleCoordinates[0] = pieceCoordinates[0] + direction;
-        possibleCoordinates[1] = pieceCoordinates[1];
+                possibleCoordinates[0] = pieceCoordinates[0] + moveDirection;
+                possibleCoordinates[1] = pieceCoordinates[1];
+                possibleNextLocations.add(possibleCoordinates.clone());
+            }
+        } catch(ArrayIndexOutOfBoundsException e) {}
 
-        possibleNextLocations.add(possibleCoordinates.clone());
+        try {
+
+            ChessPiece pieceInDiagonal1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1] + moveDirection];
+            if (pieceInDiagonal1.getPieceColor() != getPieceColor() && pieceInDiagonal1.getPieceType() != "Empty") {
+
+                possibleCoordinates[0] = pieceCoordinates[0] + moveDirection;
+                possibleCoordinates[1] = pieceCoordinates[1] + moveDirection;
+                possibleNextLocations.add(possibleCoordinates.clone());
+            }
+
+        } catch(ArrayIndexOutOfBoundsException e) {}
+
+        try {
+
+            ChessPiece pieceInDiagonal2 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1] - moveDirection];
+            if (pieceInDiagonal2.getPieceColor() != getPieceColor() && pieceInDiagonal2.getPieceType() != "Empty") {
+
+                possibleCoordinates[0] = pieceCoordinates[0] + moveDirection;
+                possibleCoordinates[1] = pieceCoordinates[1] - moveDirection;
+                possibleNextLocations.add(possibleCoordinates.clone());
+                
+            }
+        } catch(ArrayIndexOutOfBoundsException e) {}
+
+        try {
+            ChessPiece pieceInFront1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1]];
+            ChessPiece pieceInFront2 = chessBoard[pieceCoordinates[0] + 2*moveDirection][pieceCoordinates[1]];
+            if (((pieceCoordinates[0]==1 && getPieceColor()=="Black") || (pieceCoordinates[0]==6 && getPieceColor()=="White")) && pieceInFront2.getPieceType()=="Empty" && pieceInFront1.getPieceType()=="Empty") {
+                possibleCoordinates[1] = pieceCoordinates[1];
+                possibleCoordinates[0] = pieceCoordinates[0] + 2*moveDirection;
+                possibleNextLocations.add(possibleCoordinates.clone());
+            }
+        } catch(ArrayIndexOutOfBoundsException e) {}
 
         return possibleNextLocations;
         }

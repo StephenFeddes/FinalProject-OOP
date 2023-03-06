@@ -41,9 +41,12 @@ public class ChessView extends JFrame {
         
         Color tileColor;
         Tile newTile;
+        int currentTileCoordinates[] = new int[2];
         for (int row=0; row < BOARD_SIZE; row++) {
             for(int col=0; col < BOARD_SIZE; col++) {
 
+                currentTileCoordinates[0] = row;
+                currentTileCoordinates[1] = col;
                 if (row%2 == 0) {
                     if (col%2 == 0) {
                         tileColor = new Color(200,200,150);
@@ -58,10 +61,12 @@ public class ChessView extends JFrame {
                     }
                 }
 
-                for (int[] availableTileCoordinates : availableTilesList) {
+                if (ChessController.isCoordinatesInArrayList(currentTileCoordinates, availableTilesList)) {
 
-                    if (availableTileCoordinates[0]==row && availableTileCoordinates[1]==col) {
-                        tileColor = new Color(125,200,125);
+                    tileColor = new Color(125,200,125);
+
+                    if (boardIn[row][col].getPieceType() != "Empty") {
+                        tileColor = new Color(200,125,125);
                     }
                 }
 
@@ -83,7 +88,7 @@ public class ChessView extends JFrame {
 
     public ChessView() {
         // Inititalizations and constants
-        board = ChessModel.initializeBoard();
+        board = ChessController.initializeBoard();
         setBounds(0,0,518,535);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

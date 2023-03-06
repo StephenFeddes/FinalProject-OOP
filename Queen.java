@@ -22,7 +22,13 @@ public class Queen extends ChessPiece {
 
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {
 
-        ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
+        Rook rook = new Rook(getPieceColor());
+
+        Bishop bishop = new Bishop(getPieceColor());
+
+        ArrayList<int[]> possibleNextLocations = rook.possibleMovesList(chessBoard, pieceCoordinates);
+
+        possibleNextLocations.addAll(bishop.possibleMovesList(chessBoard, pieceCoordinates));
 
         return possibleNextLocations;
         }

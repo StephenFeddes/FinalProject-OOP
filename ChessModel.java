@@ -10,14 +10,15 @@ public class ChessModel {
     private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
     private ArrayList<int[]> currentPossibleMovesList = new ArrayList<int[]>();
     private boolean displayIsReady = false;
-    private String currentTurn = "White";
+    public String currentTurn = "White";
+    private ArrayList<int[]> testMovesList = new ArrayList<int[]>();
 
     public ChessPiece[][] getBoard() { return board; }
     public boolean getDisplayIsReady() { return displayIsReady; }
     public ArrayList<int[]> getCurrentPossibleMovesList() { return currentPossibleMovesList; }
 
     public ChessModel() {
-        board = initializeBoard();
+        board = ChessController.initializeBoard();
     }
 
     public void addMove(int[] selectionCoordinates) {
@@ -27,19 +28,23 @@ public class ChessModel {
         moves[movesIndex] = selectionCoordinates.clone(); // Shallow copy
 
         selectedPiece = board[moves[0][0]][moves[0][1]];
-    
+
+        testMoves(selectedPiece);
+        
         boolean placementIsAcceptable = false;
 
         if (movesIndex == 1) {
 
             currentPossibleMovesList.clear();
 
-            for (int[] coordinates : selectedPiece.possibleMovesList(board, moves[0])) {
+            for (int[] coordinates : testMovesList) {
+
                 if (Arrays.equals(coordinates, moves[1])) {
 
                     placementIsAcceptable = true;
                 }
             }
+
         } 
 
         if (placementIsAcceptable) {
@@ -62,60 +67,129 @@ public class ChessModel {
 
         } else if (selectedPiece.getPieceColor().equals(currentTurn) && movesIndex==0) {
 
-            currentPossibleMovesList = selectedPiece.possibleMovesList(board, moves[0]);
+            currentPossibleMovesList = testMovesList;
+
             movesIndex = 1;
 
         } else if (board[moves[1][0]][moves[1][1]].getPieceColor().equals(currentTurn)) {
 
-            currentPossibleMovesList.clear();
+                currentPossibleMovesList.clear();
 
-            moves[0] = moves[1];
+                moves[0] = moves[1];
 
-            currentPossibleMovesList = board[moves[1][0]][moves[1][1]].possibleMovesList(board, moves[0]);
+                selectedPiece = board[moves[1][0]][moves[1][1]];
+                
+                testMoves(selectedPiece);
+                
+                currentPossibleMovesList = testMovesList;
 
-            movesIndex = 1;
-        }
-        
-        else if (selectedPiece.getPieceColor().equals(currentTurn)) {
+                movesIndex = 1;
+            
+        } else if (selectedPiece.getPieceColor().equals(currentTurn)) {
 
-            currentPossibleMovesList.clear();
+                currentPossibleMovesList.clear();
 
-            currentPossibleMovesList = selectedPiece.possibleMovesList(board, moves[0]);
+                currentPossibleMovesList = testMovesList;
         }
     }
 
+    public boolean isCheckmate(ChessPiece[][] boardIn, String currentTurn) {
 
-    public static ChessPiece[][] initializeBoard() {
         final int BOARD_SIZE = 8;
-        ChessPiece[][] initBoard = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
-
-        // Initial setup for the black pieces
-        initBoard[0][0] = initBoard[0][7] = new Rook("Black");
-        initBoard[0][1] = initBoard[0][6] = new Knight("Black");
-        initBoard[0][2] = initBoard[0][5] = new Bishop("Black");
-        initBoard[0][3] = new Queen("Black");
-        initBoard[0][4] = new King("Black");
-        for (int col=0; col < BOARD_SIZE; col++) {
-            initBoard[1][col] = new Pawn("Black");
-        }
-
-        // Initial empty spaces
-        for (int row=2; row < BOARD_SIZE; row++) {
+        for (int row=0; row < BOARD_SIZE; row++) {
             for (int col=0; col < BOARD_SIZE; col++) {
-                initBoard[row][col] = new Empty();
+
+                testMoves(boardIn[row][col]);
+
+                if (boardIn[row][col].getPieceColor() != currentTurn && !testMovesList.isEmpty()) {
+                    testMovesList.clear();
+                    return false;
+                }
             }
         }
 
-        // Initial setup for the white pieces
-        initBoard[7][0] = initBoard[7][7] = new Rook("White");
-        initBoard[7][1] = initBoard[7][6] = new Knight("White");
-        initBoard[7][2] = initBoard[7][5] = new Bishop("White");
-        initBoard[7][3] = new Queen("White");
-        initBoard[7][4] = new King("White");
-        for (int col=0; col < BOARD_SIZE; col++) {
-            initBoard[6][col] = new Pawn("White");
+        testMovesList.clear();
+        return true;
+    }
+
+    public void testMoves(ChessPiece piece) {
+
+        testMovesList = piece.possibleMovesList(board, moves[0]);
+
+        testMovesList.clear();
+
+        for (int[] possibleMove : piece.possibleMovesList(board, moves[0])) {
+
+            ChessPiece[][] testBoard = deepCopyBoard(board);
+
+            testBoard[possibleMove[0]][possibleMove[1]] = piece;
+            testBoard[moves[0][0]][moves[0][1]] = new Empty();
+                
+            if (!isKingInCheck(testBoard)) {
+                
+                testMovesList.add(possibleMove);
+            }
         }
 
-        return initBoard;
+    }
+
+    public ChessPiece[][] deepCopyBoard(ChessPiece[][] boardIn) {
+
+        final int BOARD_SIZE = 8;
+        ChessPiece[][] deepCopiedBoard = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+        PieceFactory pieceFactory = new PieceFactory();
+
+        for (int row=0; row<BOARD_SIZE; row++) {
+            for (int col=0; col<BOARD_SIZE; col++) {
+
+                ChessPiece currentPiece = boardIn[row][col];
+                deepCopiedBoard[row][col] = pieceFactory.createPiece(currentPiece.getPieceType(), currentPiece.getPieceColor());
+            }
+        }
+
+        return deepCopiedBoard;
+    }
+
+    public boolean isKingInCheck(ChessPiece[][] boardIn) {
+
+        int BOARD_SIZE = 8;
+
+        for (int row=0; row < BOARD_SIZE; row++ ) {
+            for (int col=0; col < BOARD_SIZE; col++) {
+
+                int[] pieceCoordinates = new int[2];
+                ChessPiece piece = boardIn[row][col];
+                pieceCoordinates[0] = row;
+                pieceCoordinates[1] = col;
+
+
+                if (ChessController.isCoordinatesInArrayList(getKingCoordinates(boardIn, currentTurn), piece.possibleMovesList(boardIn, pieceCoordinates))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public int[] getKingCoordinates(ChessPiece[][] boardIn, String pieceColor) {
+    
+        int[] kingCoordinates = new int[2];
+
+        int BOARD_SIZE = 8;
+        for (int row=0; row < BOARD_SIZE; row++) {
+            for (int col=0; col < BOARD_SIZE; col++) {
+
+                if (boardIn[row][col].getPieceType() == "King" && boardIn[row][col].getPieceColor() == pieceColor) {
+
+                    kingCoordinates[0] = row;
+                    kingCoordinates[1] = col;
+                }
+            }
+        }
+
+        return kingCoordinates;
     }
 }
+
+    
