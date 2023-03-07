@@ -92,10 +92,25 @@ public class ChessView extends JFrame {
 
                 if (ChessController.isCoordinatesInArrayList(currentTileCoordinates, availableTilesList)) {
 
-                    tileColor = new Color(125,200,125);
+                    if (boardIn[row][col].getPieceColor() == turnColor) {
 
-                    if (boardIn[row][col].getPieceType() != "Empty") {
+                        tileColor = new Color(150,150,125);
+
+                    } else if (boardIn[row][col].getPieceColor() != turnColor && boardIn[row][col].getPieceType() != "Empty") {
+
                         tileColor = new Color(200,125,125);
+
+                    } else {
+
+                        tileColor = new Color(125,200,125);
+                    }
+
+                    // If castling, then the rook tiles should be green
+                    boolean isRookSelected = boardIn[tileCoordinates[0]][tileCoordinates[1]].getPieceType() == "Rook";
+                
+                    if (boardIn[row][col].getPieceType() == "Rook" && boardIn[row][col].getPieceColor() == turnColor && !isRookSelected) {
+
+                        tileColor = new Color(200,200,50);
                     }
                 }
 
