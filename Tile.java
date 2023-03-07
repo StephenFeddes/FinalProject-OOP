@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.ImageObserver;
 import java.awt.Color;
+import java.awt.Dimension;
 
 public class Tile extends JPanel {
     

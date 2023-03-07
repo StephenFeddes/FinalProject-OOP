@@ -6,6 +6,7 @@ public abstract class ChessPiece {
     public String type;
     private String color;
     private ImageIcon pieceImage;
+    public boolean isUnmoved = true;
     
     public ImageIcon getPieceImage() {return pieceImage; };
     public String getPieceType() { return type; }

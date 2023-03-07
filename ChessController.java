@@ -32,6 +32,8 @@ public class ChessController {
 
             theView.setAvailableTilesList(theModel.getCurrentPossibleMovesList());
 
+            theView.setGameStatus(theModel.getGameStatus());
+
             theView.displayBoard(theModel.getBoard());
         }
     }

@@ -4,8 +4,6 @@ import javax.swing.ImageIcon;
 
 public class Pawn extends ChessPiece {
 
-    private boolean isUnmoved = true;
-
     public Pawn(String pawnColor) {
         super(pawnColor);
         setPieceColor(pawnColor);
@@ -41,6 +39,7 @@ public class Pawn extends ChessPiece {
         }
 
         try {
+
             ChessPiece pieceInFront1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1]];
             if (pieceInFront1.getPieceType() == "Empty") {
 
@@ -77,7 +76,7 @@ public class Pawn extends ChessPiece {
         try {
             ChessPiece pieceInFront1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1]];
             ChessPiece pieceInFront2 = chessBoard[pieceCoordinates[0] + 2*moveDirection][pieceCoordinates[1]];
-            if (((pieceCoordinates[0]==1 && getPieceColor()=="Black") || (pieceCoordinates[0]==6 && getPieceColor()=="White")) && pieceInFront2.getPieceType()=="Empty" && pieceInFront1.getPieceType()=="Empty") {
+            if (isUnmoved && pieceInFront2.getPieceType()=="Empty" && pieceInFront1.getPieceType()=="Empty") {
                 possibleCoordinates[1] = pieceCoordinates[1];
                 possibleCoordinates[0] = pieceCoordinates[0] + 2*moveDirection;
                 possibleNextLocations.add(possibleCoordinates.clone());
@@ -85,6 +84,6 @@ public class Pawn extends ChessPiece {
         } catch(ArrayIndexOutOfBoundsException e) {}
 
         return possibleNextLocations;
-        }
-
+        } 
     }
+
