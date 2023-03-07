@@ -1,4 +1,4 @@
-class PieceFactory {
+public class PieceFactory {
     public ChessPiece createPiece(String pieceType, String pieceColor)
     {
         if (pieceType == null || pieceType.isEmpty())

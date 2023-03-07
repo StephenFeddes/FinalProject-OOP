@@ -16,6 +16,7 @@ public class ChessModel {
     public String currentTurn = "White";
     private String gameStatus = "White's turn        ";
     private ArrayList<int[]> testMovesList = new ArrayList<int[]>();
+    public boolean isPawnAtEnd;
     
     public String getGameStatus() { return gameStatus; }
     public ChessPiece[][] getBoard() { return board; }
@@ -66,7 +67,7 @@ public class ChessModel {
             boolean isBlackPawnAtEnd = selectedPiece.getPieceType() == "Pawn" && moves[1][0] == 7 && selectedPiece.getPieceColor() == "Black";
 
             if (isWhitePawnAtEnd || isBlackPawnAtEnd) {
-                System.out.println("works");
+                isPawnAtEnd = true;
             }
 
             switch (currentTurn) {

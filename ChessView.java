@@ -23,16 +23,22 @@ public class ChessView extends JFrame {
     private JPanel boardPanel = new JPanel();
     private JPanel gameMessagesPanel = new JPanel();
     private JPanel gameStatusPanel = new gameStatusPanel();
+    private String turnColor = "White";
+    private JPanel optionsPanel = new JPanel();
     private int[] tileCoordinates = new int[2];
     private String gameStatus = "LewisChess         ";
-
+    private ChessPiece convertedPiece;
     ActionListener listenerForBoardClick;
     private Container contentPane = getContentPane();
+    public boolean isPawnAtEnd = false;
 
+    public ChessPiece getConvertedPiece() { return convertedPiece; }
+    public String getTurnColor() { return turnColor; }
     public String getGameStatus() { return gameStatus; }
     public ChessPiece[][] getBoard() { return board; }
     public int[] getTileCoordinates() { return tileCoordinates; }
 
+    public void setTurnColor(String turnColor) { this.turnColor = turnColor; }
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
     public void setAvailableTilesList(ArrayList<int[]> currentAvailableTiles) { availableTilesList = currentAvailableTiles; }
 
@@ -42,17 +48,25 @@ public class ChessView extends JFrame {
         this.remove(gameMessagesPanel);
         this.remove(contentPane);
         this.remove(gameStatusPanel);
+        this.remove(optionsPanel);
         tileList.clear();
         boardPanel = new JPanel();
         boardPanel.setPreferredSize(new Dimension(300, 300));
         gameMessagesPanel = new JPanel();
         gameStatusPanel = new gameStatusPanel();
+        optionsPanel = createOptionsPanel(getTurnColor());
         
         contentPane.setLayout(new BorderLayout());
         contentPane.add(boardPanel, BorderLayout.CENTER);
         contentPane.add(gameMessagesPanel, BorderLayout.NORTH);
         boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
         gameMessagesPanel.setLayout(new BorderLayout());
+
+        gameMessagesPanel.add(gameStatusPanel);
+
+        if (isPawnAtEnd) {
+            gameMessagesPanel.add(optionsPanel);
+        }
         
         Color tileColor;
         Tile newTile;
@@ -91,12 +105,12 @@ public class ChessView extends JFrame {
 
                 tileList.add(newTile);
                 boardPanel.add(newTile);
-
-                gameMessagesPanel.add(gameStatusPanel);
         }
 
-        for (Tile tile : tileList) {
-            addMoveListener(tile);
+        if (!isPawnAtEnd) {
+            for (Tile tile : tileList) {
+                addMoveListener(tile);
+            }
         }
         
         SwingUtilities.updateComponentTreeUI(this);
@@ -125,6 +139,20 @@ public class ChessView extends JFrame {
         });
     }
 
+    public void addPawnAtEndListener(Tile tileIn) {
+        PieceFactory pieceFactory = new PieceFactory();
+
+        tileIn.getTileButton().addActionListener(listenerForBoardClick);
+
+        tileIn.getTileButton().addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                convertedPiece = pieceFactory.createPiece(tileIn.getPiece().getPieceType(), tileIn.getPiece().getPieceColor());
+                //isPawnAtEnd = false;
+            }
+        });
+    }
+
 
     public void addMoveListener(ActionListener listenerForBoardClick) {
 
@@ -144,14 +172,44 @@ public class ChessView extends JFrame {
         }
     }
 
-    class pieceOptionsPanel extends JPanel {
-        
-        pieceOptionsPanel() {
-            setLayout(new BorderLayout());
-            
-        }
-    }
+    JPanel createOptionsPanel(String turnColor) {
 
+        JPanel newOptionsPanel = new JPanel();
+
+        newOptionsPanel.setPreferredSize(new Dimension(100,100));
+        newOptionsPanel.setLayout(new GridLayout());
+
+        PieceFactory pieceFactory = new PieceFactory();
+
+        switch(turnColor) {
+            case "White":
+                turnColor = "Black";
+                break;
+            case "Black":
+                turnColor = "White";
+                break;
+        }
+
+        Tile rookTile = new Tile(pieceFactory.createPiece("Rook", turnColor), new Color(100,100,75));
+        addPawnAtEndListener(rookTile);
+
+        Tile knightTile = new Tile(pieceFactory.createPiece("Knight", turnColor), new Color(100,100,75));
+        addPawnAtEndListener(knightTile);
+
+        Tile bishopTile = new Tile(pieceFactory.createPiece("Bishop", turnColor), new Color(100,100,75));
+        addPawnAtEndListener(bishopTile);
+
+        Tile queenTile = new Tile(pieceFactory.createPiece("Queen", turnColor), new Color(100,100,75));
+        addPawnAtEndListener(queenTile);
+
+        newOptionsPanel.add(rookTile);
+        newOptionsPanel.add(knightTile);
+        newOptionsPanel.add(bishopTile);
+        newOptionsPanel.add(queenTile);
+
+        return newOptionsPanel;
+    }
+    
     class gameStatusPanel extends JPanel {
 
         gameStatusPanel() {
