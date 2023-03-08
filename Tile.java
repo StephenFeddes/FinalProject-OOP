@@ -43,7 +43,7 @@ public class Tile extends JPanel {
         tileButton.setOpaque(false);
         tileButton.setContentAreaFilled(false);
         tileButton.setBorderPainted(false);
-
+    
         if (!piece.getPieceType().equals("Empty")) {
             tileButton.setIcon(pieceIn.getPieceImage());
         }

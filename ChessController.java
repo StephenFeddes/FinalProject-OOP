@@ -32,10 +32,14 @@ public class ChessController {
 
             if (theView.isPawnAtEnd && theView.getConvertedPiece() != null) {
                 theModel.getBoard()[selectedTileCoordinates[0]][selectedTileCoordinates[1]] = theView.getConvertedPiece();
+                theModel.checkStatus(theModel.getBoard());
                 theModel.isPawnAtEnd = false;
             }
 
             theModel.addMove(selectedTileCoordinates);
+
+            theView.setLostBlackPieces(theModel.getLostBlackPieces());
+            theView.setLostWhitePieces(theModel.getLostWhitePieces());
 
             theView.setTurnColor(theModel.currentTurn);
 
@@ -45,7 +49,16 @@ public class ChessController {
 
             theView.setGameStatus(theModel.getGameStatus());
 
+            if (theView.isResetClicked) {
+                theModel.resetModelProperties();
+                theView.resetViewProperties();
+            }
+
             theView.displayBoard(theModel.getBoard());
+
+            if (theView.isResetClicked) {
+                theModel.setBoard(initializeBoard());
+            }
         }
     }
 

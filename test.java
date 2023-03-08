@@ -14,7 +14,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.Graphics;
 import java.awt.Color;
 
-public class ChessView extends JFrame {
+public class test extends JFrame {
 
     private final int BOARD_SIZE = 8;
     private ArrayList<Tile> tileList = new ArrayList<Tile>();
@@ -26,7 +26,6 @@ public class ChessView extends JFrame {
     private JPanel resetButtonPanel = new ResetButtonPanel();
     private JPanel westPanel = new JPanel();
     private JPanel eastPanel = new JPanel();
-    private JPanel southPanel = new JPanel();
     private String turnColor = "White";
     private JPanel optionsPanel = new JPanel();
     private int[] tileCoordinates = new int[2];
@@ -51,7 +50,7 @@ public class ChessView extends JFrame {
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
     public void setAvailableTilesList(ArrayList<int[]> currentAvailableTiles) { availableTilesList = currentAvailableTiles; }
 
-    public ChessView() {
+    public test() {
         // Inititalizations and constants
         board = ChessController.initializeBoard();
         setBounds(250,0,900,600);
@@ -70,7 +69,6 @@ public class ChessView extends JFrame {
         this.remove(westPanel);
         this.remove(eastPanel);
         this.remove(resetButtonPanel);
-        this.remove(southPanel);
         tileList.clear();
         boardPanel = new JPanel();
         boardPanel.setPreferredSize(new Dimension(300, 300));
@@ -79,16 +77,16 @@ public class ChessView extends JFrame {
         optionsPanel = createOptionsPanel(getTurnColor());
         eastPanel = new JPanel();
         westPanel = new JPanel();
-        southPanel = new JPanel();
-        southPanel.setLayout(new BorderLayout());
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
         resetButtonPanel = new ResetButtonPanel();
-    
+
         contentPane.setLayout(new BorderLayout());
         contentPane.add(boardPanel, BorderLayout.CENTER);
         contentPane.add(gameMessagesPanel, BorderLayout.NORTH);
         contentPane.add(eastPanel, BorderLayout.EAST);
         contentPane.add(westPanel, BorderLayout.WEST);
-        contentPane.add(southPanel, BorderLayout.SOUTH);
+        contentPane.add(bottomPanel, BorderLayout.SOUTH);
         eastPanel.setLayout(new GridLayout(8,2));
         westPanel.setLayout(new GridLayout(8,2));
         boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
@@ -96,8 +94,8 @@ public class ChessView extends JFrame {
         gameMessagesPanel.setLayout(new BorderLayout());
         gameMessagesPanel.add(new BlankPanel(new Color(125,0,0), 200, 100), BorderLayout.EAST);
         gameMessagesPanel.add(new BlankPanel(new Color(125,0,0), 200, 100), BorderLayout.WEST);
-        southPanel.add(new BlankPanel(new Color(125,0,0), 100, 50), BorderLayout.NORTH);
-        southPanel.add(resetButtonPanel, BorderLayout.CENTER);
+        bottomPanel.add(resetButtonPanel, BorderLayout.CENTER);
+        bottomPanel.add(new BlankPanel(new Color(125,0,0), 100, 100), BorderLayout.NORTH);
 
 
         eastPanel.setPreferredSize(new Dimension(200, 200));

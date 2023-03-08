@@ -7,21 +7,25 @@ import java.awt.Color;
 
 public class ChessModel {
 
-    private final int BOARD_SIZE = 8;
     private int movesIndex = 0;
     private int[][] moves = new int[2][2];
-    private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+    private ChessPiece[][] board = new ChessPiece[8][8];
     private ArrayList<int[]> currentPossibleMovesList = new ArrayList<int[]>();
     private boolean displayIsReady = false;
     public String currentTurn = "White";
     private String gameStatus = "White's turn        ";
     public boolean isPawnAtEnd;
-    
+    public ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>();
+    public ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>();
+
+    public ArrayList<Tile> getLostWhitePieces() { return lostWhitePieces; }
+    public ArrayList<Tile> getLostBlackPieces() { return lostBlackPieces; }
     public String getGameStatus() { return gameStatus; }
     public ChessPiece[][] getBoard() { return board; }
     public boolean getDisplayIsReady() { return displayIsReady; }
     public ArrayList<int[]> getCurrentPossibleMovesList() { return currentPossibleMovesList; }
 
+    public void setBoard(ChessPiece[][] boardIn) { board = boardIn; }
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
 
     public ChessModel() {
@@ -62,6 +66,19 @@ public class ChessModel {
 
             selectedPiece.isUnmoved = false;
 
+            if (board[moves[1][0]][moves[1][1]].getPieceColor() != currentTurn && board[moves[1][0]][moves[1][1]].getPieceType() != "Empty") {
+
+                if (currentTurn == "White") {
+                    
+                    lostBlackPieces.add(new Tile(board[moves[1][0]][moves[1][1]], new Color(165,185, 210)));
+
+                } else {
+
+                    lostWhitePieces.add(new Tile(board[moves[1][0]][moves[1][1]], new Color(165,185, 210)));
+                }
+
+            }
+
             if (board[moves[1][0]][moves[1][1]].getPieceColor() == currentTurn) {
 
                 castleKing(selectedPiece, moves[1], board);
@@ -89,48 +106,7 @@ public class ChessModel {
                     break;
             }
 
-            final int BOARD_SIZE = 8;
-            boolean cantMove = true;
-            for (int row=0; row < BOARD_SIZE; row++) {
-                for (int col=0; col < BOARD_SIZE; col++) {
-
-                int[] pieceCoordinates = new int[2];
-                pieceCoordinates[0] = row;
-                pieceCoordinates[1] = col;
-
-                    if (board[row][col].getPieceColor() == currentTurn && !testMoves(board[row][col], pieceCoordinates, board).isEmpty()) {
-                        cantMove = false;
-                    }
-                }
-            }
-
-            if (cantMove && isKingInCheck(board)) {
-
-                String winningColor = null;
-
-                switch(currentTurn) {
-                    case "White":
-                        winningColor = "Black";
-                        break;
-                    case "Black":
-                        winningColor = "White";
-                        break;
-                }
-
-                setGameStatus(String.format("Checkmate: %s wins                  ", winningColor));
-
-            } else if (cantMove) {
-
-                setGameStatus("         Draw         ");
-
-            } else if (isKingInCheck(board)) {
-
-                setGameStatus(String.format("%s in check        ", currentTurn));
-
-            } else {
-
-                setGameStatus(String.format("%s's turn        ", currentTurn));
-            }
+            checkStatus(board);
 
             currentPossibleMovesList.clear();
 
@@ -216,7 +192,7 @@ public class ChessModel {
                 break;
         }
 
-        if (boardIn[kingRowNum][5].getPieceType() == "Empty" && boardIn[kingRowNum][6].getPieceType() == "Empty" && boardIn[kingRowNum][7].isUnmoved) {
+        if (boardIn[kingRowNum][5].getPieceType() == "Empty" && boardIn[kingRowNum][6].getPieceType() == "Empty" && boardIn[kingRowNum][7].isUnmoved && boardIn[kingRowNum][7].getPieceType() == "Rook") {
 
             testBoard[kingRowNum][5] = pieceFactory.createPiece("King", kingColor);
                 
@@ -265,7 +241,51 @@ public class ChessModel {
         return castlingCoordinatesList;
     }
 
+    public void checkStatus(ChessPiece[][] boardIn) {
 
+        final int BOARD_SIZE = 8;
+            boolean cantMove = true;
+            for (int row=0; row < BOARD_SIZE; row++) {
+                for (int col=0; col < BOARD_SIZE; col++) {
+
+                int[] pieceCoordinates = new int[2];
+                pieceCoordinates[0] = row;
+                pieceCoordinates[1] = col;
+
+                    if (boardIn[row][col].getPieceColor() == currentTurn && !testMoves(boardIn[row][col], pieceCoordinates, boardIn).isEmpty()) {
+                        cantMove = false;
+                    }
+                }
+            }
+
+            if (cantMove && isKingInCheck(boardIn)) {
+
+                String winningColor = null;
+
+                switch(currentTurn) {
+                    case "White":
+                        winningColor = "Black";
+                        break;
+                    case "Black":
+                        winningColor = "White";
+                        break;
+                }
+
+                setGameStatus(String.format("Checkmate: %s wins                  ", winningColor));
+
+            } else if (cantMove) {
+
+                setGameStatus("Stalemate           ");
+
+            } else if (isKingInCheck(boardIn)) {
+
+                setGameStatus(String.format("%s in check        ", currentTurn));
+
+            } else {
+
+                setGameStatus(String.format("%s's turn        ", currentTurn));
+            }
+    }
 
     private ArrayList<int[]> testMoves(ChessPiece piece, int[] pieceCoordinates, ChessPiece[][] boardIn) {
 
@@ -343,5 +363,19 @@ public class ChessModel {
         }
 
         return kingCoordinates;
+    }
+
+    public void resetModelProperties() {
+
+        movesIndex = 0;
+        moves = new int[2][2];
+        board = ChessController.initializeBoard();
+        currentPossibleMovesList = new ArrayList<int[]>();
+        displayIsReady = false;
+        currentTurn = "White";
+        gameStatus = "White's turn        ";
+        isPawnAtEnd = false;
+        lostWhitePieces = new ArrayList<Tile>();
+        lostBlackPieces = new ArrayList<Tile>();
     }
 }
