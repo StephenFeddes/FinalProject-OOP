@@ -26,7 +26,7 @@ public class ChessController {
 
         public void actionPerformed(ActionEvent e) {
 
-            selectedTileCoordinates = theView.getTileCoordinates();
+            selectedTileCoordinates = theView.getSelectedTileCoordinates();
 
             theView.setTurnColor(theModel.currentTurn);
 

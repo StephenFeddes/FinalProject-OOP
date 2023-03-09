@@ -20,11 +20,40 @@ public class Rook extends ChessPiece {
         }
     }
 
+    public void rookMoves(ChessPiece[][] boardIn, int[] pieceCoordinates, ArrayList <int[]> possibleCoordinatesListIn, int direction, int colOrRow) {
+
+        int[] possibleCoordinates;
+        int bound = 0;
+        if (direction == -1) {
+            bound = 7;
+        }
+        
+        try {
+            possibleCoordinates = pieceCoordinates.clone();
+            possibleCoordinates[colOrRow] = possibleCoordinates[colOrRow]+direction;
+
+            ChessPiece nextPiece = boardIn[possibleCoordinates[0]][possibleCoordinates[1]];
+            while (nextPiece.getPieceColor() != getPieceColor() && possibleCoordinates[0] <= bound) {
+    
+                possibleCoordinatesListIn.add(possibleCoordinates.clone());
+                possibleCoordinates[0] = possibleCoordinates[0]+direction;
+
+                if (nextPiece.getPieceColor() != getPieceColor() && nextPiece.getPieceType() != "Empty") {
+                    break;
+                }
+
+                nextPiece = boardIn[possibleCoordinates[0]][possibleCoordinates[1]];
+            }
+        } catch(ArrayIndexOutOfBoundsException e) {}
+    }
+
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] board, int[] pieceCoordinates) {
 
         ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
 
         int[] possibleCoordinates;
+
+
          
         try {
             possibleCoordinates = pieceCoordinates.clone();

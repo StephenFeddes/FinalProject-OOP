@@ -19,7 +19,7 @@ public class PieceFactory {
         case "King":
             return new King(pieceColor);
         default:
-            throw new IllegalArgumentException("Unknown channel "+pieceType);
+            throw new IllegalArgumentException("Unknown "+pieceType);
         }
     }
 }
