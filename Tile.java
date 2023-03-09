@@ -35,8 +35,7 @@ public class Tile extends JPanel {
         setLayout(null); // Allows button in panel to be any size it wants to be
         setPiece(pieceIn);
         setTileColor(tileColorIn);
-        /* Creates an invisible button. This allows the user to
-        replace the shape with a face by clicking the shape. */
+        
         tileButton = new JButton();
         
         // Makes button invisible.
@@ -44,8 +43,9 @@ public class Tile extends JPanel {
         tileButton.setContentAreaFilled(false);
         tileButton.setBorderPainted(false);
     
-        if (!piece.getPieceType().equals("Empty")) {
-            tileButton.setIcon(pieceIn.getPieceImage());
+        // Gets the pieces image and displays it in the tile
+        if (!piece.getType().equals("Empty")) {
+            tileButton.setIcon(pieceIn.getImage());
         }
 
         add(tileButton);

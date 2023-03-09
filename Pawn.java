@@ -6,29 +6,29 @@ public class Pawn extends ChessPiece {
 
     public Pawn(String pawnColor) {
         super(pawnColor);
-        setPieceColor(pawnColor);
-        setPieceType("Pawn");
+        setColor(pawnColor);
+        setType("Pawn");
 
         switch(pawnColor) {
             case "Black":
-                setPieceImage(new ImageIcon("ChessPieces/blackPawn.png"));
+                setImage(new ImageIcon("ChessPieces/blackPawn.png"));
                 break;
 
             case "White":
-                setPieceImage(new ImageIcon("ChessPieces/whitePawn.png"));
+                setImage(new ImageIcon("ChessPieces/whitePawn.png"));
                 break;
         }
     }
 
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {
 
-        ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
+        ArrayList <int[]> possibleCoordinatesList = new ArrayList<int[]>();
         
         int moveDirection = 1;
 
         int[] possibleCoordinates = new int[2];
 
-        switch (getPieceColor()) {
+        switch (getColor()) {
             case "White":
                 moveDirection = -1;
                 break;
@@ -41,22 +41,22 @@ public class Pawn extends ChessPiece {
         try {
 
             ChessPiece pieceInFront1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1]];
-            if (pieceInFront1.getPieceType() == "Empty") {
+            if (pieceInFront1.getType() == "Empty") {
 
                 possibleCoordinates[0] = pieceCoordinates[0] + moveDirection;
                 possibleCoordinates[1] = pieceCoordinates[1];
-                possibleNextLocations.add(possibleCoordinates.clone());
+                possibleCoordinatesList.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
 
         try {
 
             ChessPiece pieceInDiagonal1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1] + moveDirection];
-            if (pieceInDiagonal1.getPieceColor() != getPieceColor() && pieceInDiagonal1.getPieceType() != "Empty") {
+            if (pieceInDiagonal1.getColor() != getColor() && pieceInDiagonal1.getType() != "Empty") {
 
                 possibleCoordinates[0] = pieceCoordinates[0] + moveDirection;
                 possibleCoordinates[1] = pieceCoordinates[1] + moveDirection;
-                possibleNextLocations.add(possibleCoordinates.clone());
+                possibleCoordinatesList.add(possibleCoordinates.clone());
             }
 
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -64,11 +64,11 @@ public class Pawn extends ChessPiece {
         try {
 
             ChessPiece pieceInDiagonal2 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1] - moveDirection];
-            if (pieceInDiagonal2.getPieceColor() != getPieceColor() && pieceInDiagonal2.getPieceType() != "Empty") {
+            if (pieceInDiagonal2.getColor() != getColor() && pieceInDiagonal2.getType() != "Empty") {
 
                 possibleCoordinates[0] = pieceCoordinates[0] + moveDirection;
                 possibleCoordinates[1] = pieceCoordinates[1] - moveDirection;
-                possibleNextLocations.add(possibleCoordinates.clone());
+                possibleCoordinatesList.add(possibleCoordinates.clone());
                 
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -76,14 +76,13 @@ public class Pawn extends ChessPiece {
         try {
             ChessPiece pieceInFront1 = chessBoard[pieceCoordinates[0] + moveDirection][pieceCoordinates[1]];
             ChessPiece pieceInFront2 = chessBoard[pieceCoordinates[0] + 2*moveDirection][pieceCoordinates[1]];
-            if (isUnmoved && pieceInFront2.getPieceType()=="Empty" && pieceInFront1.getPieceType()=="Empty") {
+            if (isUnmoved && pieceInFront2.getType()=="Empty" && pieceInFront1.getType()=="Empty") {
                 possibleCoordinates[1] = pieceCoordinates[1];
                 possibleCoordinates[0] = pieceCoordinates[0] + 2*moveDirection;
-                possibleNextLocations.add(possibleCoordinates.clone());
+                possibleCoordinatesList.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
 
-        return possibleNextLocations;
+        return possibleCoordinatesList;
         } 
     }
-

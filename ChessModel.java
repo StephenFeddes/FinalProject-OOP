@@ -11,17 +11,23 @@ public class ChessModel {
     private int[][] steps = new int[2][2]; // Array containing the selected piece coordinates and destination coordinates
     private ChessPiece[][] board = new ChessPiece[8][8];
     private ArrayList<int[]> currentPossibleMovesList = new ArrayList<int[]>();
-    public String currentTurn = "White";
+    private String turnColor = "White";
     private String gameStatus = "White's turn        ";
+    private ChessPiece selectedPiece;
     public boolean isPawnAtEnd;
-    public ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>();
-    public ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>();
+    private ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>();
+    private ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>();
+
     public ArrayList<Tile> getLostWhitePieces() { return lostWhitePieces; }
     public ArrayList<Tile> getLostBlackPieces() { return lostBlackPieces; }
     public String getGameStatus() { return gameStatus; }
     public ChessPiece[][] getBoard() { return board; }
     public ArrayList<int[]> getCurrentPossibleMovesList() { return currentPossibleMovesList; }
+    public String getTurnColor() { return turnColor; }
+    public ChessPiece getSelectedPiece() { return selectedPiece; }
 
+    public void setSelectedPiece(ChessPiece selectedPiece) { this.selectedPiece = selectedPiece; }
+    public void setTurnColor(String turnColor) { this.turnColor = turnColor; }
     public void setBoard(ChessPiece[][] boardIn) { board = boardIn; }
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
 
@@ -32,17 +38,16 @@ public class ChessModel {
     public void addMove(int[] selectionCoordinates) {
 
         ArrayList<int[]> testMovesList = new ArrayList<int[]>();
-        ChessPiece selectedPiece = new Empty();
 
         steps[moveStep] = selectionCoordinates.clone(); // Shallow copy
 
-        selectedPiece = board[steps[0][0]][steps[0][1]];
+        setSelectedPiece(board[steps[0][0]][steps[0][1]]);
 
-        testMovesList = testMoves(selectedPiece, steps[0], board);
+        testMovesList = testMoves(getSelectedPiece(), steps[0], board);
 
-        if (selectedPiece.getPieceType() == "King" && selectedPiece.isUnmoved) {
+        if (getSelectedPiece().getType() == "King" && getSelectedPiece().isUnmoved) {
 
-            testMovesList.addAll(getCastlingCoordinates(board, currentTurn));
+            testMovesList.addAll(getCastlingCoordinates(board, getTurnColor()));
         }
         
         boolean placementIsAcceptable = false;
@@ -61,45 +66,46 @@ public class ChessModel {
 
         if (placementIsAcceptable) {
 
-            selectedPiece.isUnmoved = false;
+            getSelectedPiece().isUnmoved = false;
+            ChessPiece displacedPiece = board[steps[1][0]][steps[1][1]];
 
-            if (board[steps[1][0]][steps[1][1]].getPieceColor() != currentTurn && board[steps[1][0]][steps[1][1]].getPieceType() != "Empty") {
 
-                if (currentTurn == "White") {
+            if (displacedPiece.getColor() == getTurnColor()) {
+                castleKing(getSelectedPiece(), steps[1], board);
+
+            } else {
+
+                board[steps[1][0]][steps[1][1]] = getSelectedPiece();
+                board[steps[0][0]][steps[0][1]] = new Empty();
+            }
+
+            if (displacedPiece.getColor() != getTurnColor() && displacedPiece.getType() != "Empty") {
+
+                if (getTurnColor() == "White") {
                     
-                    lostBlackPieces.add(new Tile(board[steps[1][0]][steps[1][1]], new Color(165,185, 210)));
+                    lostBlackPieces.add(new Tile(displacedPiece, new Color(165,185, 210)));
 
                 } else {
 
-                    lostWhitePieces.add(new Tile(board[steps[1][0]][steps[1][1]], new Color(165,185, 210)));
+                    lostWhitePieces.add(new Tile(displacedPiece, new Color(165,185, 210)));
                 }
 
             }
 
-            if (board[steps[1][0]][steps[1][1]].getPieceColor() == currentTurn) {
-
-                castleKing(selectedPiece, steps[1], board);
-
-            } else {
-
-                board[steps[1][0]][steps[1][1]] = selectedPiece;
-                board[steps[0][0]][steps[0][1]] = new Empty();
-            }
-
-            boolean isWhitePawnAtEnd = selectedPiece.getPieceType() == "Pawn" && steps[1][0] == 0 && selectedPiece.getPieceColor() == "White";
-            boolean isBlackPawnAtEnd = selectedPiece.getPieceType() == "Pawn" && steps[1][0] == 7 && selectedPiece.getPieceColor() == "Black";
+            boolean isWhitePawnAtEnd = getSelectedPiece().getType() == "Pawn" && steps[1][0] == 0 && getSelectedPiece().getColor() == "White";
+            boolean isBlackPawnAtEnd = getSelectedPiece().getType() == "Pawn" && steps[1][0] == 7 && getSelectedPiece().getColor() == "Black";
 
             if (isWhitePawnAtEnd || isBlackPawnAtEnd) {
                 isPawnAtEnd = true;
             }
 
-            switch (currentTurn) {
+            switch (getTurnColor()) {
                 case "White":
-                    currentTurn = "Black";
+                    setTurnColor("Black");
                     break;
     
                 case "Black":
-                    currentTurn = "White";
+                setTurnColor("White");
                     break;
             }
 
@@ -109,30 +115,30 @@ public class ChessModel {
 
             moveStep = 0;
 
-        } else if (selectedPiece.getPieceColor().equals(currentTurn) && moveStep==0) {
+        } else if (getSelectedPiece().getColor().equals(getTurnColor()) && moveStep==0) {
 
             currentPossibleMovesList = testMovesList;
             currentPossibleMovesList.add(steps[0]);
 
             moveStep = 1;
 
-        } else if (board[steps[1][0]][steps[1][1]].getPieceColor().equals(currentTurn)) {
+        } else if (board[steps[1][0]][steps[1][1]].getColor().equals(getTurnColor())) {
 
                 currentPossibleMovesList.clear();
 
                 steps[0] = steps[1];
-                selectedPiece = board[steps[1][0]][steps[1][1]];
-                testMovesList = testMoves(selectedPiece, steps[1], board);
+                setSelectedPiece(board[steps[1][0]][steps[1][1]]);
+                testMovesList = testMoves(getSelectedPiece(), steps[1], board);
 
-                if (selectedPiece.getPieceType() == "King" && selectedPiece.isUnmoved) {
-                    testMovesList.addAll(getCastlingCoordinates(board, currentTurn));
+                if (getSelectedPiece().getType() == "King" && getSelectedPiece().isUnmoved) {
+                    testMovesList.addAll(getCastlingCoordinates(board, getTurnColor()));
                 }
                 
                 currentPossibleMovesList = testMovesList;
                 currentPossibleMovesList.add(steps[1]);
                 moveStep = 1;
             
-        } else if (selectedPiece.getPieceColor().equals(currentTurn)) {
+        } else if (getSelectedPiece().getColor().equals(getTurnColor())) {
 
                 currentPossibleMovesList = testMovesList;
                 currentPossibleMovesList.add(steps[0]);
@@ -143,28 +149,28 @@ public class ChessModel {
 
         PieceFactory pieceFactory = new PieceFactory();
 
-        if (rookCoordinates[1] == 7 && king.getPieceColor() == "Black") {
+        if (rookCoordinates[1] == 7 && king.getColor() == "Black") {
 
             boardIn[0][6] = king;
             boardIn[0][5] = pieceFactory.createPiece("Rook", "Black");
             boardIn[0][4] = new Empty();
             boardIn[0][7] = new Empty();
 
-        } else if (rookCoordinates[1] == 0 && king.getPieceColor() == "Black") {
+        } else if (rookCoordinates[1] == 0 && king.getColor() == "Black") {
 
             boardIn[0][2] = king;
             boardIn[0][3] = pieceFactory.createPiece("Rook", "Black");
             boardIn[0][4] = new Empty();
             boardIn[0][0] = new Empty();
 
-        } else if (rookCoordinates[1] == 7 && king.getPieceColor() == "White") {
+        } else if (rookCoordinates[1] == 7 && king.getColor() == "White") {
 
             boardIn[7][6] = king;
             boardIn[7][5] = pieceFactory.createPiece("Rook", "White");
             boardIn[7][4] = new Empty();
             boardIn[7][7] = new Empty();
 
-        } else if (rookCoordinates[1] == 0 && king.getPieceColor() == "White") {
+        } else if (rookCoordinates[1] == 0 && king.getColor() == "White") {
 
             boardIn[7][2] = king;
             boardIn[7][3] = pieceFactory.createPiece("Rook", "White");
@@ -189,7 +195,7 @@ public class ChessModel {
                 break;
         }
 
-        if (boardIn[kingRowNum][5].getPieceType() == "Empty" && boardIn[kingRowNum][6].getPieceType() == "Empty" && boardIn[kingRowNum][7].isUnmoved && boardIn[kingRowNum][7].getPieceType() == "Rook") {
+        if (boardIn[kingRowNum][5].getType() == "Empty" && boardIn[kingRowNum][6].getType() == "Empty" && boardIn[kingRowNum][7].isUnmoved && boardIn[kingRowNum][7].getType() == "Rook") {
 
             testBoard[kingRowNum][5] = pieceFactory.createPiece("King", kingColor);
                 
@@ -205,13 +211,15 @@ public class ChessModel {
                     int[] rightCastlingCoordinates = new int[2];
                     rightCastlingCoordinates[0] = kingRowNum;
                     rightCastlingCoordinates[1] = 7;
+                    
+                    boardIn[rightCastlingCoordinates[0]][rightCastlingCoordinates[1]].canCastle = true;
 
                     castlingCoordinatesList.add(rightCastlingCoordinates);
                 }
             }
         }
 
-        if (boardIn[kingRowNum][3].getPieceType() == "Empty" && boardIn[kingRowNum][2].getPieceType() == "Empty" && boardIn[kingRowNum][1].getPieceType() == "Empty") {
+        if (boardIn[kingRowNum][3].getType() == "Empty" && boardIn[kingRowNum][2].getType() == "Empty" && boardIn[kingRowNum][1].getType() == "Empty") {
 
             testBoard[kingRowNum][3] = pieceFactory.createPiece("King", kingColor);
             testBoard[kingRowNum][4] = new Empty();
@@ -229,6 +237,8 @@ public class ChessModel {
                     int[] leftCastlingCoordinates = new int[2];
                     leftCastlingCoordinates[0] = kingRowNum;
                     leftCastlingCoordinates[1] = 0;
+
+                    boardIn[leftCastlingCoordinates[0]][leftCastlingCoordinates[1]].canCastle = true;
 
                     castlingCoordinatesList.add(leftCastlingCoordinates);
                 }
@@ -249,7 +259,7 @@ public class ChessModel {
                 pieceCoordinates[0] = row;
                 pieceCoordinates[1] = col;
 
-                    if (boardIn[row][col].getPieceColor() == currentTurn && !testMoves(boardIn[row][col], pieceCoordinates, boardIn).isEmpty()) {
+                    if (boardIn[row][col].getColor() == getTurnColor() && !testMoves(boardIn[row][col], pieceCoordinates, boardIn).isEmpty()) {
                         cantMove = false;
                     }
                 }
@@ -259,7 +269,7 @@ public class ChessModel {
 
                 String winningColor = null;
 
-                switch(currentTurn) {
+                switch(getTurnColor()) {
                     case "White":
                         winningColor = "Black";
                         break;
@@ -276,11 +286,11 @@ public class ChessModel {
 
             } else if (isKingInCheck(boardIn)) {
 
-                setGameStatus(String.format("%s in check        ", currentTurn));
+                setGameStatus(String.format("%s in check        ", getTurnColor()));
 
             } else {
 
-                setGameStatus(String.format("%s's turn        ", currentTurn));
+                setGameStatus(String.format("%s's turn        ", getTurnColor()));
             }
     }
 
@@ -314,7 +324,7 @@ public class ChessModel {
             for (int col=0; col<BOARD_SIZE; col++) {
 
                 ChessPiece currentPiece = boardIn[row][col];
-                deepCopiedBoard[row][col] = pieceFactory.createPiece(currentPiece.getPieceType(), currentPiece.getPieceColor());
+                deepCopiedBoard[row][col] = pieceFactory.createPiece(currentPiece.getType(), currentPiece.getColor());
             }
         }
 
@@ -334,7 +344,7 @@ public class ChessModel {
                 pieceCoordinates[1] = col;
 
 
-                if (ChessController.isCoordinatesInArrayList(getKingCoordinates(boardIn, currentTurn), piece.possibleMovesList(boardIn, pieceCoordinates))) {
+                if (ChessController.isCoordinatesInArrayList(getKingCoordinates(boardIn, getTurnColor()), piece.possibleMovesList(boardIn, pieceCoordinates))) {
                     return true;
                 }
             }
@@ -351,7 +361,7 @@ public class ChessModel {
         for (int row=0; row < BOARD_SIZE; row++) {
             for (int col=0; col < BOARD_SIZE; col++) {
 
-                if (boardIn[row][col].getPieceType() == "King" && boardIn[row][col].getPieceColor() == pieceColor) {
+                if (boardIn[row][col].getType() == "King" && boardIn[row][col].getColor() == pieceColor) {
 
                     kingCoordinates[0] = row;
                     kingCoordinates[1] = col;
@@ -368,7 +378,7 @@ public class ChessModel {
         steps = new int[2][2];
         board = ChessController.initializeBoard();
         currentPossibleMovesList = new ArrayList<int[]>();
-        currentTurn = "White";
+        setTurnColor("White");
         gameStatus = "White's turn        ";
         isPawnAtEnd = false;
         lostWhitePieces = new ArrayList<Tile>();

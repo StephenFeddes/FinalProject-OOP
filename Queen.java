@@ -6,30 +6,30 @@ public class Queen extends ChessPiece {
 
     public  Queen(String queenColor) {
         super(queenColor);
-        setPieceColor(queenColor);
-        setPieceType("Queen");
+        setColor(queenColor);
+        setType("Queen");
 
         switch(queenColor) {
             case "Black":
-                setPieceImage(new ImageIcon("ChessPieces/blackQueen.png"));
+                setImage(new ImageIcon("ChessPieces/blackQueen.png"));
                 break;
 
             case "White":
-                setPieceImage(new ImageIcon("ChessPieces/whiteQueen.png"));
+                setImage(new ImageIcon("ChessPieces/whiteQueen.png"));
                 break;
         }
     }
 
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {
 
-        Rook rook = new Rook(getPieceColor());
+        Rook rook = new Rook(getColor());
 
-        Bishop bishop = new Bishop(getPieceColor());
+        Bishop bishop = new Bishop(getColor());
 
-        ArrayList<int[]> possibleNextLocations = rook.possibleMovesList(chessBoard, pieceCoordinates);
+        ArrayList<int[]> possibleCoordinatesList = rook.possibleMovesList(chessBoard, pieceCoordinates);
 
-        possibleNextLocations.addAll(bishop.possibleMovesList(chessBoard, pieceCoordinates));
+        possibleCoordinatesList.addAll(bishop.possibleMovesList(chessBoard, pieceCoordinates));
 
-        return possibleNextLocations;
+        return possibleCoordinatesList;
         }
 }

@@ -40,11 +40,13 @@ public class ChessView extends JFrame {
     private Container contentPane = getContentPane(); // Content the JFrame will ultimately display
     private ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>(); // List of white pieces lost
     private ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>(); // List of black pieces lost
+    private ChessPiece selectedPiece;
     public boolean isResetClicked = false; // If reset is clicked, the board is reset to the initial state
     public boolean isPawnAtEnd = false; // If a pawn reaches the end, new piece options are displayed
-    ActionListener listenerForBoardClick; // The controller that will listen to the button clicks
+    ActionListener listenerForBoardClick; // The controller that will listen to the button click
 
     // Getters
+    public ChessPiece getSelectedPiece() { return selectedPiece; }
     public ChessPiece getConvertedPiece() { return convertedPiece; }
     public String getTurnColor() { return turnColor; }
     public String getGameStatus() { return gameStatus; }
@@ -52,6 +54,7 @@ public class ChessView extends JFrame {
     public int[] getSelectedTileCoordinates() { return selectedTileCoordinates; }
 
     // Setters
+    public void setSelectedPiece(ChessPiece selectedPiece) {this.selectedPiece = selectedPiece; }
     public void setLostWhitePieces(ArrayList<Tile> lostWhitePieces) { this.lostWhitePieces = lostWhitePieces; }
     public void setLostBlackPieces(ArrayList<Tile> lostBlackPieces) { this.lostBlackPieces = lostBlackPieces; }
     public void setTurnColor(String turnColor) { this.turnColor = turnColor; }
@@ -180,12 +183,12 @@ public class ChessView extends JFrame {
                 // If tile is in availableTilesList, color it appropriately.
                 if (ChessController.isCoordinatesInArrayList(tileCoordinates, availableTilesList)) {
 
-                    if (boardIn[row][col].getPieceColor() == turnColor) {
+                    if (boardIn[row][col].getColor() == turnColor) {
 
                         // Colors the selected tile grey
                         tileColor = new Color(150,150,125);
 
-                    } else if (boardIn[row][col].getPieceColor() != turnColor && boardIn[row][col].getPieceType() != "Empty") {
+                    } else if (boardIn[row][col].getColor() != turnColor && boardIn[row][col].getType() != "Empty") {
 
                         // Colors the tile red if the selected piece can attack it
                         tileColor = new Color(200,125,125);
@@ -196,11 +199,8 @@ public class ChessView extends JFrame {
                         tileColor = new Color(125,200,125);
                     }
 
-                    // If selected tile is a rook, it's color should still be grey like the others
-                    boolean isRookSelected = boardIn[tileCoordinates[0]][tileCoordinates[1]].getPieceType() == "Rook";
-                
-                    // If rook of the same color as the current turn is available, then it means castling can happen. The tile should be yellow
-                    if (boardIn[row][col].getPieceType() == "Rook" && boardIn[row][col].getPieceColor() == turnColor && !isRookSelected) {
+                    // If a rook of the same color as the current turn is available, then it means castling can happen. That rook tile should be yellow
+                    if (getSelectedPiece().getType() == "King" && boardIn[row][col].canCastle) {
 
                         // Colors the rook tile yellow if the selected king can castle with it
                         tileColor = new Color(200,200,50);
@@ -256,7 +256,7 @@ public class ChessView extends JFrame {
         tileIn.getTileButton().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                convertedPiece = pieceFactory.createPiece(tileIn.getPiece().getPieceType(), tileIn.getPiece().getPieceColor());
+                convertedPiece = pieceFactory.createPiece(tileIn.getPiece().getType(), tileIn.getPiece().getColor());
             }
         });
     }

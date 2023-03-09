@@ -6,16 +6,16 @@ public class Bishop extends ChessPiece {
 
     public Bishop(String bishopColor) {
         super(bishopColor);
-        setPieceColor(bishopColor);
-        setPieceType("Bishop");
+        setColor(bishopColor);
+        setType("Bishop");
 
         switch(bishopColor) {
             case "Black":
-                setPieceImage(new ImageIcon("ChessPieces/blackBishop.png"));
+                setImage(new ImageIcon("ChessPieces/blackBishop.png"));
                 break;
 
             case "White":
-                setPieceImage(new ImageIcon("ChessPieces/whiteBishop.png"));
+                setImage(new ImageIcon("ChessPieces/whiteBishop.png"));
                 break;
         }
     }
@@ -30,13 +30,13 @@ public class Bishop extends ChessPiece {
             possibleCoordinates[0] = possibleCoordinates[0]+1;
             possibleCoordinates[1] = possibleCoordinates[1]+1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getPieceColor() != getPieceColor() && possibleCoordinates[0] >= 0) {
+            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
     
                 possibleNextLocations.add(possibleCoordinates.clone());
                 possibleCoordinates[0] = possibleCoordinates[0]+1;
                 possibleCoordinates[1] = possibleCoordinates[1]+1;
 
-                if (nextPiece.getPieceColor() != getPieceColor() && nextPiece.getPieceType() != "Empty") {
+                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
                     break;
                 }
 
@@ -49,13 +49,13 @@ public class Bishop extends ChessPiece {
             possibleCoordinates[0] = possibleCoordinates[0]-1;
             possibleCoordinates[1] = possibleCoordinates[1]+1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getPieceColor() != getPieceColor() && possibleCoordinates[0] >= 0) {
+            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
     
                 possibleNextLocations.add(possibleCoordinates.clone());
                 possibleCoordinates[0] = possibleCoordinates[0]-1;
                 possibleCoordinates[1] = possibleCoordinates[1]+1;
 
-                if (nextPiece.getPieceColor() != getPieceColor() && nextPiece.getPieceType() != "Empty") {
+                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
                     break;
                 }
 
@@ -68,13 +68,13 @@ public class Bishop extends ChessPiece {
             possibleCoordinates[0] = possibleCoordinates[0]+1;
             possibleCoordinates[1] = possibleCoordinates[1]-1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getPieceColor() != getPieceColor() && possibleCoordinates[0] >= 0) {
+            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
     
                 possibleNextLocations.add(possibleCoordinates.clone());
                 possibleCoordinates[0] = possibleCoordinates[0]+1;
                 possibleCoordinates[1] = possibleCoordinates[1]-1;
 
-                if (nextPiece.getPieceColor() != getPieceColor() && nextPiece.getPieceType() != "Empty") {
+                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
                     break;
                 }
 
@@ -87,13 +87,13 @@ public class Bishop extends ChessPiece {
             possibleCoordinates[0] = possibleCoordinates[0]-1;
             possibleCoordinates[1] = possibleCoordinates[1]-1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getPieceColor() != getPieceColor() && possibleCoordinates[0] >= 0) {
+            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
     
                 possibleNextLocations.add(possibleCoordinates.clone());
                 possibleCoordinates[0] = possibleCoordinates[0]-1;
                 possibleCoordinates[1] = possibleCoordinates[1]-1;
 
-                if (nextPiece.getPieceColor() != getPieceColor() && nextPiece.getPieceType() != "Empty") {
+                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
                     break;
                 }
 

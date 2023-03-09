@@ -6,16 +6,16 @@ public class King extends ChessPiece {
 
     public King(String rookColor) {
         super(rookColor);
-        setPieceColor(rookColor);
-        setPieceType("King");
+        setColor(rookColor);
+        setType("King");
 
         switch(rookColor) {
             case "Black":
-                setPieceImage(new ImageIcon("ChessPieces/blackKing.png"));
+                setImage(new ImageIcon("ChessPieces/blackKing.png"));
                 break;
 
             case "White":
-                setPieceImage(new ImageIcon("ChessPieces/whiteKing.png"));
+                setImage(new ImageIcon("ChessPieces/whiteKing.png"));
                 break;
         }
     }
@@ -31,7 +31,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1]+1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -42,7 +42,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1]+1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -53,7 +53,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1]-1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -64,7 +64,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1]-1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -75,7 +75,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1];
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -86,7 +86,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1];
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -97,7 +97,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1]+1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}
@@ -108,7 +108,7 @@ public class King extends ChessPiece {
             possibleCoordinates[1] = possibleCoordinates[1]-1;
             ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
 
-            if (nextPiece.getPieceType() == "Empty" || nextPiece.getPieceColor() != getPieceColor()) {
+            if (nextPiece.getType() == "Empty" || nextPiece.getColor() != getColor()) {
                 possibleNextLocations.add(possibleCoordinates.clone());
             }
         } catch(ArrayIndexOutOfBoundsException e) {}

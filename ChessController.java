@@ -28,7 +28,7 @@ public class ChessController {
 
             selectedTileCoordinates = theView.getSelectedTileCoordinates();
 
-            theView.setTurnColor(theModel.currentTurn);
+            theView.setTurnColor(theModel.getTurnColor());
 
             if (theView.isPawnAtEnd && theView.getConvertedPiece() != null) {
                 theModel.getBoard()[selectedTileCoordinates[0]][selectedTileCoordinates[1]] = theView.getConvertedPiece();
@@ -38,10 +38,12 @@ public class ChessController {
 
             theModel.addMove(selectedTileCoordinates);
 
+            theView.setSelectedPiece(theModel.getSelectedPiece());
+
             theView.setLostBlackPieces(theModel.getLostBlackPieces());
             theView.setLostWhitePieces(theModel.getLostWhitePieces());
 
-            theView.setTurnColor(theModel.currentTurn);
+            theView.setTurnColor(theModel.getTurnColor());
 
             theView.isPawnAtEnd = theModel.isPawnAtEnd;
 

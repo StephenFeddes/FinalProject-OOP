@@ -3,9 +3,9 @@ import java.util.ArrayList;
 public class Empty extends ChessPiece {
 
     public Empty() {
-        setPieceType("Empty");
+        setType("Empty");
         
-        setPieceColor("Null");
+        setColor("Null");
     }
 
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {
