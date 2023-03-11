@@ -32,7 +32,7 @@ public class ChessModel {
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
 
     public ChessModel() {
-        board = ChessController.initializeBoard();
+        board = ChessLib.initializeBoard();
     }
 
     public void addMove(int[] selectionCoordinates) {
@@ -40,9 +40,7 @@ public class ChessModel {
         ArrayList<int[]> testMovesList = new ArrayList<int[]>();
 
         steps[moveStep] = selectionCoordinates.clone(); // Shallow copy
-
         setSelectedPiece(board[steps[0][0]][steps[0][1]]);
-
         testMovesList = testMoves(getSelectedPiece(), steps[0], board);
 
         if (getSelectedPiece().getType() == "King" && getSelectedPiece().isUnmoved) {
@@ -53,7 +51,6 @@ public class ChessModel {
         boolean placementIsAcceptable = false;
 
         if (moveStep == 1) {
-
             for (int[] coordinates : testMovesList) {
 
                 if (Arrays.equals(coordinates, steps[1])) {
@@ -68,7 +65,6 @@ public class ChessModel {
 
             getSelectedPiece().isUnmoved = false;
             ChessPiece displacedPiece = board[steps[1][0]][steps[1][1]];
-
 
             if (displacedPiece.getColor() == getTurnColor()) {
                 castleKing(getSelectedPiece(), steps[1], board);
@@ -183,7 +179,7 @@ public class ChessModel {
 
         ArrayList<int[]> castlingCoordinatesList = new ArrayList<int[]>();
         PieceFactory pieceFactory = new PieceFactory();
-        ChessPiece[][] testBoard = deepCopyBoard(boardIn);
+        ChessPiece[][] testBoard = ChessLib.deepCopyBoard(boardIn);
         int kingRowNum = 0;
 
         switch (kingColor) {
@@ -201,7 +197,7 @@ public class ChessModel {
                 
             if (!isKingInCheck(testBoard)) {
 
-                testBoard = deepCopyBoard(boardIn);
+                testBoard = ChessLib.deepCopyBoard(boardIn);
                 testBoard[kingRowNum][6] = pieceFactory.createPiece("King", kingColor);
                 testBoard[kingRowNum][5] = pieceFactory.createPiece("Rook", kingColor);
                 testBoard[kingRowNum][4] = new Empty();
@@ -226,7 +222,7 @@ public class ChessModel {
                 
             if (!isKingInCheck(testBoard)) {
 
-                testBoard = deepCopyBoard(boardIn);
+                testBoard = ChessLib.deepCopyBoard(boardIn);
                 testBoard[kingRowNum][2] = pieceFactory.createPiece("King", kingColor);
                 testBoard[kingRowNum][3] = pieceFactory.createPiece("Rook", kingColor);
                 testBoard[kingRowNum][4] = new Empty();
@@ -300,7 +296,7 @@ public class ChessModel {
 
         for (int[] possibleMove : piece.possibleMovesList(boardIn, pieceCoordinates)) {
 
-            ChessPiece[][] testBoard = deepCopyBoard(boardIn);
+            ChessPiece[][] testBoard = ChessLib.deepCopyBoard(boardIn);
 
             testBoard[possibleMove[0]][possibleMove[1]] = piece;
             testBoard[pieceCoordinates[0]][pieceCoordinates[1]] = new Empty();
@@ -312,23 +308,6 @@ public class ChessModel {
         }
 
         return movesList;
-    }
-
-    private ChessPiece[][] deepCopyBoard(ChessPiece[][] boardIn) {
-
-        final int BOARD_SIZE = 8;
-        ChessPiece[][] deepCopiedBoard = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
-        PieceFactory pieceFactory = new PieceFactory();
-
-        for (int row=0; row<BOARD_SIZE; row++) {
-            for (int col=0; col<BOARD_SIZE; col++) {
-
-                ChessPiece currentPiece = boardIn[row][col];
-                deepCopiedBoard[row][col] = pieceFactory.createPiece(currentPiece.getType(), currentPiece.getColor());
-            }
-        }
-
-        return deepCopiedBoard;
     }
 
     private boolean isKingInCheck(ChessPiece[][] boardIn) {
@@ -343,8 +322,7 @@ public class ChessModel {
                 pieceCoordinates[0] = row;
                 pieceCoordinates[1] = col;
 
-
-                if (ChessController.isCoordinatesInArrayList(getKingCoordinates(boardIn, getTurnColor()), piece.possibleMovesList(boardIn, pieceCoordinates))) {
+                if (ChessLib.isCoordinatesInArrayList(getKingCoordinates(boardIn, getTurnColor()), piece.possibleMovesList(boardIn, pieceCoordinates))) {
                     return true;
                 }
             }
@@ -376,7 +354,7 @@ public class ChessModel {
 
         moveStep = 0;
         steps = new int[2][2];
-        board = ChessController.initializeBoard();
+        board = ChessLib.initializeBoard();
         currentPossibleMovesList = new ArrayList<int[]>();
         setTurnColor("White");
         gameStatus = "White's turn        ";

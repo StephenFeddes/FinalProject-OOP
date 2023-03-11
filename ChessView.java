@@ -63,7 +63,7 @@ public class ChessView extends JFrame {
 
     public ChessView() {
         
-        board = ChessController.initializeBoard(); // 
+        board = ChessLib.initializeBoard(); // 
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -181,11 +181,11 @@ public class ChessView extends JFrame {
                 }
 
                 // If tile is in availableTilesList, color it appropriately.
-                if (ChessController.isCoordinatesInArrayList(tileCoordinates, availableTilesList)) {
+                if (ChessLib.isCoordinatesInArrayList(tileCoordinates, availableTilesList)) {
 
-                    if (boardIn[row][col].getColor() == turnColor) {
+                    // Colors the selected piece's tile's grey
+                    if (getSelectedPiece().equals(boardIn[row][col])) {
 
-                        // Colors the selected tile grey
                         tileColor = new Color(150,150,125);
 
                     } else if (boardIn[row][col].getColor() != turnColor && boardIn[row][col].getType() != "Empty") {
@@ -225,8 +225,8 @@ public class ChessView extends JFrame {
                 addMoveListener(tile);
             }
         }
-        
-        // Redisplays the JFrame
+
+    // Redisplays the JFrame
         SwingUtilities.updateComponentTreeUI(this);
     }
     }
@@ -288,7 +288,7 @@ public class ChessView extends JFrame {
     public void resetViewProperties() {
 
         tileList = new ArrayList<Tile>();
-        board = ChessController.initializeBoard();
+        board = ChessLib.initializeBoard();
         availableTilesList = new ArrayList<int[]>();
     
         

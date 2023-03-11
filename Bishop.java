@@ -5,8 +5,7 @@ import javax.swing.ImageIcon;
 public class Bishop extends ChessPiece {
 
     public Bishop(String bishopColor) {
-        super(bishopColor);
-        setColor(bishopColor);
+        super.setColor(bishopColor);
         setType("Bishop");
 
         switch(bishopColor) {
@@ -22,85 +21,14 @@ public class Bishop extends ChessPiece {
     
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] board, int[] pieceCoordinates) {
 
-        ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
-        int[] possibleCoordinates;
+        ArrayList <int[]> possibleCoordinatesList = new ArrayList<int[]>();
 
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]+1;
-            possibleCoordinates[1] = possibleCoordinates[1]+1;
-            ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
-    
-                possibleNextLocations.add(possibleCoordinates.clone());
-                possibleCoordinates[0] = possibleCoordinates[0]+1;
-                possibleCoordinates[1] = possibleCoordinates[1]+1;
+        // Builds the list of coordinates the bishop could go
+        findCoordinates(board, pieceCoordinates, possibleCoordinatesList, 1, 1, false);
+        findCoordinates(board, pieceCoordinates, possibleCoordinatesList, -1, -1, false);
+        findCoordinates(board, pieceCoordinates, possibleCoordinatesList, 1, -1, false);
+        findCoordinates(board, pieceCoordinates, possibleCoordinatesList, -1, 1, false);
 
-                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
-                    break;
-                }
-
-                nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]-1;
-            possibleCoordinates[1] = possibleCoordinates[1]+1;
-            ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
-    
-                possibleNextLocations.add(possibleCoordinates.clone());
-                possibleCoordinates[0] = possibleCoordinates[0]-1;
-                possibleCoordinates[1] = possibleCoordinates[1]+1;
-
-                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
-                    break;
-                }
-
-                nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]+1;
-            possibleCoordinates[1] = possibleCoordinates[1]-1;
-            ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
-    
-                possibleNextLocations.add(possibleCoordinates.clone());
-                possibleCoordinates[0] = possibleCoordinates[0]+1;
-                possibleCoordinates[1] = possibleCoordinates[1]-1;
-
-                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
-                    break;
-                }
-
-                nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]-1;
-            possibleCoordinates[1] = possibleCoordinates[1]-1;
-            ChessPiece nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            while (nextPiece.getColor() != getColor() && possibleCoordinates[0] >= 0) {
-    
-                possibleNextLocations.add(possibleCoordinates.clone());
-                possibleCoordinates[0] = possibleCoordinates[0]-1;
-                possibleCoordinates[1] = possibleCoordinates[1]-1;
-
-                if (nextPiece.getColor() != getColor() && nextPiece.getType() != "Empty") {
-                    break;
-                }
-
-                nextPiece = board[possibleCoordinates[0]][possibleCoordinates[1]];
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-        
-        return possibleNextLocations;
+        return possibleCoordinatesList;
     }
 }

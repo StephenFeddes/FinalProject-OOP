@@ -23,87 +23,16 @@ public class Knight extends ChessPiece {
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] board, int[] pieceCoordinates) {
 
         ArrayList <int[]> possibleNextLocations = new ArrayList<int[]>();
-        int[] possibleCoordinates;
 
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]+2;
-            possibleCoordinates[1] = possibleCoordinates[1]+1;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]+2;
-            possibleCoordinates[1] = possibleCoordinates[1]-1;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]-2;
-            possibleCoordinates[1] = possibleCoordinates[1]-1;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]-2;
-            possibleCoordinates[1] = possibleCoordinates[1]+1;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]-1;
-            possibleCoordinates[1] = possibleCoordinates[1]+2;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]+1;
-            possibleCoordinates[1] = possibleCoordinates[1]+2;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]-1;
-            possibleCoordinates[1] = possibleCoordinates[1]-2;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
-
-        try {
-            possibleCoordinates = pieceCoordinates.clone();
-            possibleCoordinates[0] = possibleCoordinates[0]+1;
-            possibleCoordinates[1] = possibleCoordinates[1]-2;
-
-            if (board[possibleCoordinates[0]][possibleCoordinates[1]].getColor() != getColor()) {
-                possibleNextLocations.add(possibleCoordinates.clone());
-            }
-        } catch(ArrayIndexOutOfBoundsException e) {}
+        // Builds the list of coordinates the knight could go
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, 1, 2, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, -1, 2, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, -1, -2, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, 1, -2, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, 2, -1, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, 2, 1, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, -2, -1, true);
+        findCoordinates(board, pieceCoordinates, possibleNextLocations, -2, 1, true);
         
         return possibleNextLocations;
     }

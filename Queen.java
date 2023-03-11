@@ -20,16 +20,16 @@ public class Queen extends ChessPiece {
         }
     }
 
+    public Queen() {}
+
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] chessBoard, int[] pieceCoordinates) {
 
+        // Delegation pattern. Queen contains all the moves a bishop and rook can make.
         Rook rook = new Rook(getColor());
-
         Bishop bishop = new Bishop(getColor());
-
         ArrayList<int[]> possibleCoordinatesList = rook.possibleMovesList(chessBoard, pieceCoordinates);
-
         possibleCoordinatesList.addAll(bishop.possibleMovesList(chessBoard, pieceCoordinates));
 
         return possibleCoordinatesList;
-        }
+    }
 }

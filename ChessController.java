@@ -17,97 +17,56 @@ public class ChessController {
         this.theView = theView;
         this.theModel = theModel;
 
+        // Gives the view the controller its input should be sent to
         this.theView.addMoveListener(new MoveListener());
     }
 
+    // Controls input/output between the view and model
     class MoveListener implements ActionListener {
-
-        int[] selectedTileCoordinates;
 
         public void actionPerformed(ActionEvent e) {
 
-            selectedTileCoordinates = theView.getSelectedTileCoordinates();
+            int[] selectedTileCoordinates = theView.getSelectedTileCoordinates(); // Tile coordinates of the last tile clicked
 
+            // Model informs the view whose turn it is so that the view can display that fact
             theView.setTurnColor(theModel.getTurnColor());
 
-            if (theView.isPawnAtEnd && theView.getConvertedPiece() != null) {
+            /* Once a pawn reaches the end, only the options panel can interact with the controller.
+            Once the pawn has been converted to the desired piece, moves can be made again. */
+            if (theView.isPawnAtEnd ) {
                 theModel.getBoard()[selectedTileCoordinates[0]][selectedTileCoordinates[1]] = theView.getConvertedPiece();
                 theModel.checkStatus(theModel.getBoard());
                 theModel.isPawnAtEnd = false;
             }
 
+            // Takes the selected tile coordinates and gives it to the model to run chess logic on
             theModel.addMove(selectedTileCoordinates);
 
+            // Gets what the model considers to be the selected piece and informs the view
             theView.setSelectedPiece(theModel.getSelectedPiece());
 
+            // Gets the list of lost pieces and gives it to the view to display
             theView.setLostBlackPieces(theModel.getLostBlackPieces());
             theView.setLostWhitePieces(theModel.getLostWhitePieces());
 
-            theView.setTurnColor(theModel.getTurnColor());
+            theView.setTurnColor(theModel.getTurnColor()); // Model notifies the view whose turn it is now
 
-            theView.isPawnAtEnd = theModel.isPawnAtEnd;
+            theView.isPawnAtEnd = theModel.isPawnAtEnd; // Model notifies the view a pawn has reached the end of the board
 
+            // Model gives the view the list of tiles that should be colored appropriately
             theView.setAvailableTilesList(theModel.getCurrentPossibleMovesList());
 
+            // Model notifies the view the status of the game, such as check, draw, checkmate, or whose turn it is
             theView.setGameStatus(theModel.getGameStatus());
 
+            // If the reset button is clicked, reset all the properties for the model and view
             if (theView.isResetClicked) {
                 theModel.resetModelProperties();
                 theView.resetViewProperties();
             }
 
+            // Displays the board according to the model's logic
             theView.displayBoard(theModel.getBoard());
-
-            if (theView.isResetClicked) {
-                theModel.setBoard(initializeBoard());
-            }
         }
     }
-
-public static boolean isCoordinatesInArrayList(int[] coordinates, ArrayList<int[]> availableTilesList) {
-
-    for (int[] availableTileCoordinates : availableTilesList) {
-
-        if (availableTileCoordinates[0]==coordinates[0] && availableTileCoordinates[1]==coordinates[1]) {
-            return true;
-        }
-    }
-
-    return false;
 }
-
-public static ChessPiece[][] initializeBoard() {
-    final int BOARD_SIZE = 8;
-    ChessPiece[][] initBoard = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
-
-    // Initial setup for the black pieces
-    initBoard[0][0] = initBoard[0][7] = new Rook("Black");
-    initBoard[0][1] = initBoard[0][6] = new Knight("Black");
-    initBoard[0][2] = initBoard[0][5] = new Bishop("Black");
-    initBoard[0][3] = new Queen("Black");
-    initBoard[0][4] = new King("Black");
-    for (int col=0; col < BOARD_SIZE; col++) {
-        initBoard[1][col] = new Pawn("Black");
-    }
-
-    // Initial empty spaces
-    for (int row=2; row < BOARD_SIZE; row++) {
-        for (int col=0; col < BOARD_SIZE; col++) {
-            initBoard[row][col] = new Empty();
-        }
-    }
-
-    // Initial setup for the white pieces
-    initBoard[7][0] = initBoard[7][7] = new Rook("White");
-    initBoard[7][1] = initBoard[7][6] = new Knight("White");
-    initBoard[7][2] = initBoard[7][5] = new Bishop("White");
-    initBoard[7][3] = new Queen("White");
-    initBoard[7][4] = new King("White");
-    for (int col=0; col < BOARD_SIZE; col++) {
-        initBoard[6][col] = new Pawn("White");
-    }
-
-    return initBoard;
-}
-}
-

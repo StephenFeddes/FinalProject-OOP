@@ -1,33 +1,27 @@
-import java.util.Random;
-
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.ImageObserver;
 import java.awt.Color;
-import java.awt.Dimension;
 
 public class Tile extends JPanel {
     
+    // Member variables
     private JButton tileButton;
     private ChessPiece piece;
     private Color tileColor;
     private int rowCoordinate;
     private int colCoordinate;
 
+    // Getters
     public ChessPiece getPiece() { return piece; }
     public Color getTileColor() { return tileColor; }
     public int getRowCoordinate() { return rowCoordinate; }
     public int getColCoordinate() { return colCoordinate; }
     public JButton getTileButton() { return tileButton; }
 
-    public void setRowCoordinate(int rowCoordinate) { this.rowCoordinate = rowCoordinate; }
-    public void setColCoordinate(int colCoordinate) { this.colCoordinate = colCoordinate; }
+    // Setters
+    public void setRowCoordinate(int rowCoordinate) { this.rowCoordinate = rowCoordinate; } // row coordinate of tile in the board
+    public void setColCoordinate(int colCoordinate) { this.colCoordinate = colCoordinate; } // column coordinate of tile in the board
     public void setPiece(ChessPiece piece) { this.piece = piece; }
     public void setTileColor(Color tileColor) { this.tileColor = tileColor; }
 
@@ -36,6 +30,7 @@ public class Tile extends JPanel {
         setPiece(pieceIn);
         setTileColor(tileColorIn);
         
+        // Invisible button over the tile. Has the piece icon on it.
         tileButton = new JButton();
         
         // Makes button invisible.
@@ -51,6 +46,7 @@ public class Tile extends JPanel {
         add(tileButton);
     }
 
+    // Draws the tile itself, not the piece it contains
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
