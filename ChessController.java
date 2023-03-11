@@ -53,8 +53,8 @@ public class ChessController {
 
             theView.isPawnAtEnd = theModel.isPawnAtEnd; // Model notifies the view a pawn has reached the end of the board
 
-            // Model gives the view the list of tiles that should be colored appropriately
-            theView.setAvailableTilesList(theModel.getCurrentPossibleMovesList());
+            // Model gives the view the list of tiles that the selected piece could go
+            theView.setAvailableTilesList(theModel.getCurrentPossibleDestinationsList());
 
             // Model notifies the view the status of the game, such as check, draw, checkmate, or whose turn it is
             theView.setGameStatus(theModel.getGameStatus());

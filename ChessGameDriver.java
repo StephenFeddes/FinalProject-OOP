@@ -1,4 +1,4 @@
-public class ChessGame {
+public class ChessGameDriver {
 
     public static void main(String[] args) {
 

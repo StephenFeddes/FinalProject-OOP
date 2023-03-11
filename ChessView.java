@@ -219,8 +219,9 @@ public class ChessView extends JFrame {
                 boardPanel.add(newTile);
         }
 
-        // If a pawn reaches the end, the board becomes unresponsive until that pawn is converted
-        if (!isPawnAtEnd) {
+        /* If a pawn reaches the end, the board becomes unresponsive until that pawn is converted. 
+        If its checkmate, it becomes permanently unresponsive until the game is reset */
+        if (!isPawnAtEnd && !getGameStatus().contains("Checkmate")) {
             for (Tile tile : tileList) {
                 addMoveListener(tile);
             }
