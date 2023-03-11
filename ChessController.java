@@ -59,14 +59,35 @@ public class ChessController {
             // Model notifies the view the status of the game, such as check, draw, checkmate, or whose turn it is
             theView.setGameStatus(theModel.getGameStatus());
 
-            // If the reset button is clicked, reset all the properties for the model and view
-            if (theView.isResetClicked) {
-                theModel.resetModelProperties();
-                theView.resetViewProperties();
-            }
-
             // Displays the board according to the model's logic
             theView.displayBoard(theModel.getBoard());
+
+            if (theModel.isPlacementValid) {
+                theView.boardIsReadyToFlip = true;
+
+                Thread boardFlipThread = new Thread(new Runnable() {
+
+                    public void run() {
+    
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {}
+                        
+                        theView.boardIsReadyToFlip = false;
+                        theModel.flipBoard(theModel.getBoard());
+                        theView.displayBoard(theModel.getBoard());
+                    }
+                });
+    
+                boardFlipThread.start();
+            }
+
+            // If the reset button is clicked, reset all the properties for the model and view and display the new board
+            if (theView.isResetClicked && !theView.boardIsReadyToFlip) {
+                theModel.resetModelProperties();
+                theView.resetViewProperties();
+                theView.displayBoard(theModel.getBoard());
+            }
         }
     }
 }

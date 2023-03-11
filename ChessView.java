@@ -43,6 +43,7 @@ public class ChessView extends JFrame {
     private ChessPiece selectedPiece;
     public boolean isResetClicked = false; // If reset is clicked, the board is reset to the initial state
     public boolean isPawnAtEnd = false; // If a pawn reaches the end, new piece options are displayed
+    public boolean boardIsReadyToFlip = false;
     ActionListener listenerForBoardClick; // The controller that will listen to the button click
 
     // Getters
@@ -134,7 +135,12 @@ public class ChessView extends JFrame {
             westPanel.add(lostBlackPiece);
         }
 
-        // Panel containing all the panels, such as the board, south, etc
+        // Panel containing the board
+        boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+        boardPanel.setBackground(new Color(125,0, 0));
+        boardPanel.setBorder(BorderFactory.createLineBorder(new Color(125,0, 0), 2));
+
+        // Panel containing all the panels, such as the board, south panel, etc
         gamePanel.setLayout(new BorderLayout());
         Dimension screenSize = Toolkit.getDefaultToolkit(). getScreenSize();
         gamePanel.setBounds((int)screenSize.getWidth()/4,0, 700, 650);
@@ -149,13 +155,6 @@ public class ChessView extends JFrame {
         contentPane.add(gamePanel, BorderLayout.CENTER); // Adds the whole game panel to the center
         contentPane.setBackground(new Color(125,0,0));
 
-        //
-        boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
-        boardPanel.setBackground(new Color(125,0, 0));
-        boardPanel.setBorder(BorderFactory.createLineBorder(new Color(125,0, 0), 2));
-        
-
-    
         Color tileColor;
         Tile newTile;
         int tileCoordinates[] = new int[2];
@@ -221,7 +220,8 @@ public class ChessView extends JFrame {
 
         /* If a pawn reaches the end, the board becomes unresponsive until that pawn is converted. 
         If its checkmate, it becomes permanently unresponsive until the game is reset */
-        if (!isPawnAtEnd && !getGameStatus().contains("Checkmate")) {
+
+        if (!isPawnAtEnd && !getGameStatus().contains("Checkmate") && !boardIsReadyToFlip) {
             for (Tile tile : tileList) {
                 addMoveListener(tile);
             }
@@ -301,6 +301,7 @@ public class ChessView extends JFrame {
         lostWhitePieces = new ArrayList<Tile>();
         lostBlackPieces = new ArrayList<Tile>();
         isResetClicked = false;
+        boardIsReadyToFlip = false;
     }
 
     // Creates the options panel and returns it

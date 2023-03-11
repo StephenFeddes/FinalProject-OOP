@@ -18,6 +18,7 @@ public class ChessModel {
     private ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>();
     private ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>();
     public boolean isPawnAtEnd;
+    public boolean isPlacementValid = false;
 
     // Getters
     public ArrayList<Tile> getLostWhitePieces() { return lostWhitePieces; }
@@ -59,20 +60,20 @@ public class ChessModel {
         }
         
         // Checks if the user clicks on an appropriate tile the piece can go
-        boolean placementIsValid = false;
+        isPlacementValid = false;
         if (moveStep == 1) {
             for (int[] coordinates : testMovesList) {
 
                 if (Arrays.equals(coordinates, steps[1])) {
 
-                    placementIsValid = true;
+                    isPlacementValid = true;
                 }
             }
 
         } 
 
         // Places the selected piece in the valid destination that was selected
-        if (placementIsValid) {
+        if (isPlacementValid) {
 
             getSelectedPiece().isUnmoved = false;
 
@@ -165,20 +166,26 @@ public class ChessModel {
         // Castles the king with the selected rook whose coordinates are inputted
 
         PieceFactory pieceFactory = new PieceFactory();
-        final int lastColIndex = 7;
-        final int firstColIndex = 0;
 
-        // Castles black king with its right rook
-        if (rookCoordinates[1] == lastColIndex) {
+        int QueenSideRookColIndex = 7;
+        int KingSideRookColIndex = 0;
+        if (king.getColor() == "Black") {
+
+            QueenSideRookColIndex = 0;
+            KingSideRookColIndex = 7;
+        }
+       
+        // Castles king with its king-side rook
+        if (rookCoordinates[1] == KingSideRookColIndex) {
 
             boardIn[rookCoordinates[0]][6] = king;
             boardIn[rookCoordinates[0]][5] = pieceFactory.createPiece("Rook", king.getColor());
             boardIn[rookCoordinates[0]][4] = new Empty();
             boardIn[rookCoordinates[0]][7] = new Empty();
 
-        } else if (rookCoordinates[1] == firstColIndex) {
+        } else if (rookCoordinates[1] == QueenSideRookColIndex) {
 
-            // Castles king with its left rook
+            // Castles king with its queen-side rook
             boardIn[rookCoordinates[0]][2] = king;
             boardIn[rookCoordinates[0]][3] = pieceFactory.createPiece("Rook", king.getColor());
             boardIn[rookCoordinates[0]][4] = new Empty();
