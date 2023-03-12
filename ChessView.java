@@ -259,10 +259,8 @@ public class ChessView extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
 
-                try {
-                    ChessLib.playAudio("ChessData/buttonClicked.wav");
-                } catch (Exception ex) {}
-
+                ChessLib.playAudio("ChessData/buttonClicked.wav");
+        
                 convertedPiece = pieceFactory.createPiece(tileIn.getPiece().getType(), tileIn.getPiece().getColor());
             }
         });

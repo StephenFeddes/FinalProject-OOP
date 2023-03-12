@@ -78,11 +78,7 @@ public class ChessModel {
         // Places the selected piece in the valid destination that was selected
         if (isPlacementValid) {
 
-            try {
-                ChessLib.playAudio("ChessData/pieceMoved.wav");
-            } catch (Exception e) {}
-
-            getSelectedPiece().isUnmoved = false;
+            ChessLib.playAudio("ChessData/pieceMoved.wav");
 
             // Piece, whether its the "Empty" piece or an enemy piece, whose tile becomes occupied by the selected piece
             ChessPiece displacedPiece = board[steps[1][0]][steps[1][1]];
@@ -144,9 +140,7 @@ public class ChessModel {
 
         } else if (getSelectedPiece().getColor().equals(getTurnColor()) && moveStep==0) {
 
-            try {
                 ChessLib.playAudio("ChessData/pieceSelected.wav");
-            } catch (Exception ex) {}
 
             // If the player selects their piece, then the first step for performing a move is complete.
             currentPossibleDestinationsList = testMovesList;
@@ -155,9 +149,7 @@ public class ChessModel {
 
         } else if (board[steps[1][0]][steps[1][1]].getColor().equals(getTurnColor()) && moveStep == 1) {
 
-            try {
                 ChessLib.playAudio("ChessData/pieceSelected.wav");
-            } catch (Exception ex) {}
 
             // Scenario where a user selects another of their pieces even though they have already selected one
 
@@ -333,26 +325,22 @@ public class ChessModel {
 
                 setGameStatus(String.format("Checkmate: %s wins                  ", winningColor));
 
-                try {
-                    ChessLib.playAudio("ChessData/checkMate.wav");
-                } catch (Exception ex) {}
+        
+                ChessLib.playAudio("ChessData/checkMate.wav");
+
 
             } else if (cantMove) {
 
                 // If the player is not in check and they cannot make any moves on their turn, then the game is a draw
                 setGameStatus("Stalemate           ");
 
-                try {
-                    ChessLib.playAudio("ChessData/gameNotification.wav");
-                } catch (Exception ex) {}
+                ChessLib.playAudio("ChessData/gameNotification.wav");
 
             } else if (isKingInCheck(boardIn, getTurnColor())) {
 
                 setGameStatus(String.format("%s in check        ", getTurnColor()));
 
-                try {
                     ChessLib.playAudio("ChessData/gameNotification.wav");
-                } catch (Exception ex) {}
 
             } else {
 

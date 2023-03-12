@@ -15,14 +15,15 @@ import java.awt.Color;
 
 public class ChessLib {
 
-    public static void playAudio(String audioFilePath) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
+    public static void playAudio(String audioFilePath) {
 
+        try {
         File file = new File(audioFilePath);
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
         Clip clip = AudioSystem.getClip();
         clip.open(audioStream);
-
         clip.start();
+        } catch(Exception e) {}
     }
 
     // Flips the turn color
