@@ -2,6 +2,7 @@
 ## Developer name: Stephen Feddes
 ## Email: stephenpfeddes@lewisu.com or feddessteve@gmail.com
 ## Credit to: https://en.wikipedia.org/wiki/Chess_piece for the chess piece icons
+## Credit to https://mixkit.co/free-sound-effects/click/ for the audio, which is under a Free License
 ## Description:
 This is the final project I chose to design on my own as a final project for my Object-Oriented Programming class.
 The OOP concepts my project used are: abstraction, encapsulation, polymorphism, and inheritance. I also used three design patterns: delegation, model-view-controller, and factory.

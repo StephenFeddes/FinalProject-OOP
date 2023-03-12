@@ -1,14 +1,29 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.io.File;
+import java.io.IOException;
 import java.awt.Color;
 
 public class ChessLib {
+
+    public static void playAudio(String audioFilePath) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
+
+        File file = new File(audioFilePath);
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioStream);
+
+        clip.start();
+    }
 
     // Flips the turn color
     public static String flipTurnColor(String turnColor) {
@@ -37,7 +52,7 @@ public class ChessLib {
         return false;
     }
 
-    // Deep copies the board
+    // Returns a deep copy of the inputted board
     public static ChessPiece[][] deepCopyBoard(ChessPiece[][] boardIn) {
 
         final int BOARD_SIZE = 8;
@@ -188,11 +203,11 @@ class Bishop extends ChessPiece {
 
         switch(bishopColor) {
             case "Black":
-                setImage(new ImageIcon("ChessPieces/blackBishop.png"));
+                setImage(new ImageIcon("ChessData/blackBishop.png"));
                 break;
 
             case "White":
-                setImage(new ImageIcon("ChessPieces/whiteBishop.png"));
+                setImage(new ImageIcon("ChessData/whiteBishop.png"));
                 break;
         }
     }
@@ -237,11 +252,11 @@ class King extends ChessPiece {
 
         switch(rookColor) {
             case "Black":
-                setImage(new ImageIcon("ChessPieces/blackKing.png"));
+                setImage(new ImageIcon("ChessData/blackKing.png"));
                 break;
 
             case "White":
-                setImage(new ImageIcon("ChessPieces/whiteKing.png"));
+                setImage(new ImageIcon("ChessData/whiteKing.png"));
                 break;
         }
     }
@@ -273,11 +288,11 @@ class Knight extends ChessPiece {
 
         switch(knightColor) {
             case "Black":
-                setImage(new ImageIcon("ChessPieces/blackKnight.png"));
+                setImage(new ImageIcon("ChessData/blackKnight.png"));
                 break;
 
             case "White":
-                setImage(new ImageIcon("ChessPieces/whiteKnight.png"));
+                setImage(new ImageIcon("ChessData/whiteKnight.png"));
                 break;
         }
     }
@@ -309,11 +324,11 @@ class Pawn extends ChessPiece {
 
         switch(pawnColor) {
             case "Black":
-                setImage(new ImageIcon("ChessPieces/blackPawn.png"));
+                setImage(new ImageIcon("ChessData/blackPawn.png"));
                 break;
 
             case "White":
-                setImage(new ImageIcon("ChessPieces/whitePawn.png"));
+                setImage(new ImageIcon("ChessData/whitePawn.png"));
                 break;
         }
     }
@@ -321,21 +336,10 @@ class Pawn extends ChessPiece {
     public ArrayList<int[]> possibleMovesList(ChessPiece[][] boardIn, int[] pieceCoordinates) {
 
         ArrayList <int[]> possibleCoordinatesList = new ArrayList<int[]>();
-        
-        int moveDirection = 1;
-
         int[] possibleCoordinates = new int[2];
 
-        // Gets the direction the pawn is moving, which depends on its color
-        switch (getColor()) {
-            case "White":
-                moveDirection = -1;
-                break;
-            
-            case "Black":
-                moveDirection = 1;
-                break;
-        }
+        // On every turn, the player, regardless of their color, can only move their pawn upwards on the board
+        final int moveDirection = -1;
 
         // Gets the moves the pawn can make that are in front of it
         try {
@@ -397,11 +401,11 @@ class Pawn extends ChessPiece {
     
             switch(queenColor) {
                 case "Black":
-                    setImage(new ImageIcon("ChessPieces/blackQueen.png"));
+                    setImage(new ImageIcon("ChessData/blackQueen.png"));
                     break;
     
                 case "White":
-                    setImage(new ImageIcon("ChessPieces/whiteQueen.png"));
+                    setImage(new ImageIcon("ChessData/whiteQueen.png"));
                     break;
             }
         }
@@ -429,11 +433,11 @@ class Pawn extends ChessPiece {
     
             switch(rookColor) {
                 case "Black":
-                    setImage(new ImageIcon("ChessPieces/blackRook.png"));
+                    setImage(new ImageIcon("ChessData/blackRook.png"));
                     break;
     
                 case "White":
-                    setImage(new ImageIcon("ChessPieces/whiteRook.png"));
+                    setImage(new ImageIcon("ChessData/whiteRook.png"));
                     break;
             }
         }

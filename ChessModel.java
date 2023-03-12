@@ -2,9 +2,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 import java.awt.Color;
+import java.io.IOException;
 
 public class ChessModel {
 
@@ -75,6 +78,10 @@ public class ChessModel {
         // Places the selected piece in the valid destination that was selected
         if (isPlacementValid) {
 
+            try {
+                ChessLib.playAudio("ChessData/pieceMoved.wav");
+            } catch (Exception e) {}
+
             getSelectedPiece().isUnmoved = false;
 
             // Piece, whether its the "Empty" piece or an enemy piece, whose tile becomes occupied by the selected piece
@@ -111,12 +118,14 @@ public class ChessModel {
             }
 
             // Checks if the moved piece is a pawn that has reached end of the board
-            final int bottomRowIndex = 7;
-            final int topRowIndex = 0;
-            boolean isWhitePawnAtEnd = getSelectedPiece().getType() == "Pawn" && steps[1][0] == topRowIndex && getSelectedPiece().getColor() == "White";
-            boolean isBlackPawnAtEnd = getSelectedPiece().getType() == "Pawn" && steps[1][0] == bottomRowIndex && getSelectedPiece().getColor() == "Black";
+            final int TOP_ROW_INDEX = 0;
 
-            if (isWhitePawnAtEnd || isBlackPawnAtEnd) {
+            if (getSelectedPiece().getType() == "Pawn" && steps[1][0] == TOP_ROW_INDEX) {
+
+                try {
+                    ChessLib.playAudio("ChessData/gameNotification.wav");
+                } catch (Exception ex) {}
+
                 isPawnAtEnd = true; // By setting it to true, the game pauses and the user must selected what piece the pawn should become
             }
 
@@ -125,8 +134,9 @@ public class ChessModel {
 
             checkStatus(board); // Checks the status of the board to see if the game is in a stalemate check, or checkmate
 
-            // Now that the move is over, the destinations list the a selected piece can go should be cleared
+            // Now that the move is over, the destinations list should be cleared
             currentPossibleDestinationsList.clear();
+            //Arrays.fill(steps, null);
 
             /* The step number resets to 0. The other player must now first select 
             a piece before they can choose a destination in their second step */
@@ -134,12 +144,20 @@ public class ChessModel {
 
         } else if (getSelectedPiece().getColor().equals(getTurnColor()) && moveStep==0) {
 
-            // If the player selects their piece, then the first step for performing a move is complete. mo
+            try {
+                ChessLib.playAudio("ChessData/pieceSelected.wav");
+            } catch (Exception ex) {}
+
+            // If the player selects their piece, then the first step for performing a move is complete.
             currentPossibleDestinationsList = testMovesList;
             currentPossibleDestinationsList.add(steps[0]);
             moveStep = 1; // moveStep is now 1, meaning the user can now select a valid destination to send the selected piece
 
-        } else if (board[steps[1][0]][steps[1][1]].getColor().equals(getTurnColor())) {
+        } else if (board[steps[1][0]][steps[1][1]].getColor().equals(getTurnColor()) && moveStep == 1) {
+
+            try {
+                ChessLib.playAudio("ChessData/pieceSelected.wav");
+            } catch (Exception ex) {}
 
             // Scenario where a user selects another of their pieces even though they have already selected one
 
@@ -156,7 +174,7 @@ public class ChessModel {
                 currentPossibleDestinationsList = testMovesList;
                 currentPossibleDestinationsList.add(steps[1]);
 
-                // Because a piece is selected, moveStep is remains 1, which means the destination for the piece can be selected now
+                // Because a piece is selected, moveStep remains 1, which means the destination for the piece can be selected now
                 moveStep = 1;
         }
     }
@@ -166,109 +184,122 @@ public class ChessModel {
         // Castles the king with the selected rook whose coordinates are inputted
 
         PieceFactory pieceFactory = new PieceFactory();
+        final int KING_ROW_INDEX = 7;
 
-        int QueenSideRookColIndex = 7;
-        int KingSideRookColIndex = 0;
+        int kingColIndex = 4;
+        int kingSideRookColIndex = 7; // The column index of the white rook closest to its king
+        int queenSideRookColIndex = 0; // The column index of the white rook closest to its queen
+        int queenSideDirection = -1; // Indicates if the queen is to 
+        int kingSideDirection = 1;
         if (king.getColor() == "Black") {
 
-            QueenSideRookColIndex = 0;
-            KingSideRookColIndex = 7;
+            // Same as above, but this time the king is black
+            kingColIndex = 3; 
+            kingSideRookColIndex = 0;
+            queenSideRookColIndex = 7;
+            queenSideDirection = 1;
+            kingSideDirection = -1;
         }
        
         // Castles king with its king-side rook
-        if (rookCoordinates[1] == KingSideRookColIndex) {
+        if (rookCoordinates[1] == kingSideRookColIndex) {
 
-            boardIn[rookCoordinates[0]][6] = king;
-            boardIn[rookCoordinates[0]][5] = pieceFactory.createPiece("Rook", king.getColor());
-            boardIn[rookCoordinates[0]][4] = new Empty();
-            boardIn[rookCoordinates[0]][7] = new Empty();
+            boardIn[KING_ROW_INDEX][kingColIndex + 2*kingSideDirection] = king;
+            boardIn[KING_ROW_INDEX][kingColIndex + kingSideDirection] = pieceFactory.createPiece("Rook", king.getColor());
+            boardIn[KING_ROW_INDEX][kingColIndex] = new Empty();
+            boardIn[KING_ROW_INDEX][kingSideRookColIndex] = new Empty();
 
-        } else if (rookCoordinates[1] == QueenSideRookColIndex) {
+        } else if (rookCoordinates[1] == queenSideRookColIndex) {
 
             // Castles king with its queen-side rook
-            boardIn[rookCoordinates[0]][2] = king;
-            boardIn[rookCoordinates[0]][3] = pieceFactory.createPiece("Rook", king.getColor());
-            boardIn[rookCoordinates[0]][4] = new Empty();
-            boardIn[rookCoordinates[0]][0] = new Empty();
+            boardIn[KING_ROW_INDEX][kingColIndex + 2*queenSideDirection] = king;
+            boardIn[KING_ROW_INDEX][kingColIndex + queenSideDirection] = pieceFactory.createPiece("Rook", king.getColor());
+            boardIn[KING_ROW_INDEX][kingColIndex] = new Empty();
+            boardIn[KING_ROW_INDEX][queenSideRookColIndex] = new Empty();
         } 
     }
 
     private ArrayList<int[]> getCastlingCoordinates(ChessPiece[][] boardIn, String kingColor) {
 
         /* This method takes the current state of the board and the chosen 
-        king color to determine the rooks, if any, the king can castle with */
+        king color to determine the rooks, if any, the king can castle with. This method assumes the king is unmoved */
 
         ArrayList<int[]> castlingCoordinatesList = new ArrayList<int[]>();
         PieceFactory pieceFactory = new PieceFactory();
         ChessPiece[][] testBoard = ChessLib.deepCopyBoard(boardIn);
-        int kingRowNum = 0;
+        final int KING_ROW_NUM = 7;
 
-        switch (kingColor) {
-            case "White":
-                kingRowNum = 7; // If the king is white, then we are examining the unmoved rooks, which would be in row 7 as well
-                break;
-            case "Black":
-                kingRowNum = 0; // If the king is black, then we are examining the unmoved rooks, which would be in row 7 as well
-                break;
+        int kingColIndex = 4; // Column index of the unmoved white king
+        int kingSideRookColIndex = 7; // The column index of the white rook closest to its king
+        int queenSideRookColIndex = 0; // The column index of the white rook closest to its queen
+        int queenSideDirection = -1; // Indicates if the white queen is to the east or west side of the board
+        int kingSideDirection = 1; // Indicates if the white king is to the east or west side of the board
+        if (kingColor == "Black") {
+
+            // If the selected king is black, not white, these are the appropriate numbers
+            kingColIndex = 3;
+            kingSideRookColIndex = 0;
+            queenSideRookColIndex = 7;
+            queenSideDirection = 1;
+            kingSideDirection = -1;
         }
-
-        final int kingColIndex = 4;
-        final int rightRookColIndex = 7;
-        final int leftRookColIndex = 0;
         
         /*  If all the spaces between the rook and king are empty and both the king and rook are unmoved, castling could take place,
         assuming other requirements are met. e.g., the king cannot castle to escape check if its already in check. */
 
-        // Checks the right-hand rook to see if it can be castled with the selected king.
-        if (boardIn[kingRowNum][kingColIndex+1].getType() == "Empty" && boardIn[kingRowNum][kingColIndex+2].getType() == "Empty" && boardIn[kingRowNum][7].isUnmoved && boardIn[kingRowNum][rightRookColIndex].getType() == "Rook" && !isKingInCheck(board)) {
+        /* Checks the king-side rook to see if it can be castled with the selected king. 
+        If the rook can be castled, its coordinates are added to the list */
+        if (boardIn[KING_ROW_NUM][kingColIndex+kingSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingColIndex+2*kingSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
 
             // King cannot pass through check while it moves toward the castle
-            testBoard[kingRowNum][kingColIndex+1] = pieceFactory.createPiece("King", kingColor);
-            testBoard[kingRowNum][kingColIndex] = new Empty();
-            if (!isKingInCheck(testBoard)) {
+            testBoard[KING_ROW_NUM][kingColIndex+kingSideDirection] = pieceFactory.createPiece("King", kingColor);
+            testBoard[KING_ROW_NUM][kingColIndex] = new Empty();
+            if (!isKingInCheck(testBoard, getTurnColor())) {
 
                 testBoard = ChessLib.deepCopyBoard(boardIn);
-                testBoard[kingRowNum][kingColIndex+2] = pieceFactory.createPiece("King", kingColor);
-                testBoard[kingRowNum][kingColIndex+1] = pieceFactory.createPiece("Rook", kingColor);
-                testBoard[kingRowNum][kingColIndex] = new Empty();
+                testBoard[KING_ROW_NUM][kingColIndex+2*kingSideDirection] = pieceFactory.createPiece("King", kingColor);
+                testBoard[KING_ROW_NUM][kingColIndex+kingSideDirection] = pieceFactory.createPiece("Rook", kingColor);
+                testBoard[KING_ROW_NUM][kingColIndex] = new Empty();
+                testBoard[KING_ROW_NUM][kingSideRookColIndex] = new Empty();
 
-                // If the king lands into check after the castling ends, then castling with the right rook cannot happen
-                if (!isKingInCheck(testBoard)) {
+                // If the king lands into check after the castling ends, then castling with the king-side rook cannot happen
+                if (!isKingInCheck(testBoard, getTurnColor())) {
 
-                    int[] rightCastlingCoordinates = new int[2];
-                    rightCastlingCoordinates[0] = kingRowNum;
-                    rightCastlingCoordinates[1] = rightRookColIndex;
+                    int[] kingSideCastlingCoordinates = new int[2];
+                    kingSideCastlingCoordinates[0] = KING_ROW_NUM;
+                    kingSideCastlingCoordinates[1] = kingSideRookColIndex;
                     
-                    // canCastle lets the view know the castling is valid, which the view does by coloring the rook's tile yellow.
-                    boardIn[rightCastlingCoordinates[0]][rightCastlingCoordinates[1]].canCastle = true;
+                    /* canCastle lets the view know the castling is valid for this king, 
+                    which the view does by coloring the rook's tile yellow when this king is selected */
+                    boardIn[kingSideCastlingCoordinates[0]][kingSideCastlingCoordinates[1]].canCastle = true;
 
-                    castlingCoordinatesList.add(rightCastlingCoordinates);
+                    castlingCoordinatesList.add(kingSideCastlingCoordinates);
                 }
             }
         }
 
-        // Checks the left rook to see if it can be castled with the selected king
-        if (boardIn[kingRowNum][kingColIndex-1].getType() == "Empty" && boardIn[kingRowNum][kingColIndex-2].getType() == "Empty" && boardIn[kingRowNum][kingColIndex-3].getType() == "Empty") {
+        // Checks the queen-side rook to see if it can be castled with the selected king
+        if (boardIn[KING_ROW_NUM][kingColIndex+queenSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingColIndex+2*queenSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingColIndex+3*queenSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][queenSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
 
-            testBoard[kingRowNum][kingColIndex-1] = pieceFactory.createPiece("King", kingColor);
-            testBoard[kingRowNum][kingColIndex] = new Empty();
-            if (!isKingInCheck(testBoard)) {
+            testBoard[KING_ROW_NUM][kingColIndex+queenSideDirection] = pieceFactory.createPiece("King", kingColor);
+            testBoard[KING_ROW_NUM][kingColIndex] = new Empty();
+            if (!isKingInCheck(testBoard, getTurnColor())) {
 
                 testBoard = ChessLib.deepCopyBoard(boardIn);
-                testBoard[kingRowNum][kingColIndex-2] = pieceFactory.createPiece("King", kingColor);
-                testBoard[kingRowNum][kingColIndex-1] = pieceFactory.createPiece("Rook", kingColor);
-                testBoard[kingRowNum][kingColIndex] = new Empty();
-                testBoard[kingRowNum][leftRookColIndex] = new Empty();
+                testBoard[KING_ROW_NUM][kingColIndex+2*queenSideDirection] = pieceFactory.createPiece("King", kingColor);
+                testBoard[KING_ROW_NUM][kingColIndex+queenSideDirection] = pieceFactory.createPiece("Rook", kingColor);
+                testBoard[KING_ROW_NUM][kingColIndex] = new Empty();
+                testBoard[KING_ROW_NUM][queenSideRookColIndex] = new Empty();
 
-                if (!isKingInCheck(testBoard)) {
+                if (!isKingInCheck(testBoard, getTurnColor())) {
 
-                    int[] leftCastlingCoordinates = new int[2];
-                    leftCastlingCoordinates[0] = kingRowNum;
-                    leftCastlingCoordinates[1] = leftRookColIndex;
+                    int[] queenSideCastlingCoordinates = new int[2];
+                    queenSideCastlingCoordinates[0] = KING_ROW_NUM;
+                    queenSideCastlingCoordinates[1] = queenSideRookColIndex;
 
-                    boardIn[leftCastlingCoordinates[0]][leftCastlingCoordinates[1]].canCastle = true;
+                    boardIn[queenSideCastlingCoordinates[0]][queenSideCastlingCoordinates[1]].canCastle = true;
 
-                    castlingCoordinatesList.add(leftCastlingCoordinates);
+                    castlingCoordinatesList.add(queenSideCastlingCoordinates);
                 }
             }
         }
@@ -281,43 +312,51 @@ public class ChessModel {
         final int BOARD_SIZE = 8;
             boolean cantMove = true;
             for (int row=0; row < BOARD_SIZE; row++) {
+
                 for (int col=0; col < BOARD_SIZE; col++) {
 
                 int[] pieceCoordinates = new int[2];
                 pieceCoordinates[0] = row;
                 pieceCoordinates[1] = col;
-
+                    
+                    // Checks if the player can move any valid moves on their turn
                     if (boardIn[row][col].getColor() == getTurnColor() && !testMoves(boardIn[row][col], pieceCoordinates, boardIn).isEmpty()) {
                         cantMove = false;
                     }
                 }
             }
 
-            if (cantMove && isKingInCheck(boardIn)) {
+            if (cantMove && isKingInCheck(boardIn, getTurnColor())) {
 
-                String winningColor = null;
-
-                switch(getTurnColor()) {
-                    case "White":
-                        winningColor = "Black";
-                        break;
-                    case "Black":
-                        winningColor = "White";
-                        break;
-                }
+                // If the current player cannot move, then the other player has the winning color (white or black)
+                String winningColor = ChessLib.flipTurnColor(getTurnColor());
 
                 setGameStatus(String.format("Checkmate: %s wins                  ", winningColor));
 
+                try {
+                    ChessLib.playAudio("ChessData/checkMate.wav");
+                } catch (Exception ex) {}
+
             } else if (cantMove) {
 
+                // If the player is not in check and they cannot make any moves on their turn, then the game is a draw
                 setGameStatus("Stalemate           ");
 
-            } else if (isKingInCheck(boardIn)) {
+                try {
+                    ChessLib.playAudio("ChessData/gameNotification.wav");
+                } catch (Exception ex) {}
+
+            } else if (isKingInCheck(boardIn, getTurnColor())) {
 
                 setGameStatus(String.format("%s in check        ", getTurnColor()));
 
+                try {
+                    ChessLib.playAudio("ChessData/gameNotification.wav");
+                } catch (Exception ex) {}
+
             } else {
 
+                // If the player is not in check, checkmate, or stalemate, then the view should only say who's turn it is
                 setGameStatus(String.format("%s's turn        ", getTurnColor()));
             }
     }
@@ -326,26 +365,34 @@ public class ChessModel {
 
         ArrayList<int[]> movesList = new ArrayList<int[]>();
 
-        for (int[] possibleMove : piece.possibleMovesList(boardIn, pieceCoordinates)) {
+        /* Tests each destination a piece can usually go under normal circumstances. If, after the move, the king is 
+        immediately in check, that destination should not be added to the list of destinations the selected piece could go */
+        for (int[] possibleDestination : piece.possibleMovesList(boardIn, pieceCoordinates)) {
 
-            ChessPiece[][] testBoard = ChessLib.deepCopyBoard(boardIn);
+            ChessPiece[][] testBoard = ChessLib.deepCopyBoard(boardIn); // Deep copy of the board
 
-            testBoard[possibleMove[0]][possibleMove[1]] = piece;
+            // Moves the piece to the destination it could go, assuming it does not put the player's king in check
+            testBoard[possibleDestination[0]][possibleDestination[1]] = piece;
             testBoard[pieceCoordinates[0]][pieceCoordinates[1]] = new Empty();
+            
+            // Checks if the king is in check after the piece is moved
+            if (!isKingInCheck(testBoard, getTurnColor())) {
                 
-            if (!isKingInCheck(testBoard)) {
-                
-                movesList.add(possibleMove);
+                /* If the king is not in check after the piece is moved, then that destination is added 
+                to the list of destinations the selected piece could go */
+                movesList.add(possibleDestination); // If the king is not 
             }
         }
 
         return movesList;
     }
 
-    private boolean isKingInCheck(ChessPiece[][] boardIn) {
+    private boolean isKingInCheck(ChessPiece[][] boardIn, String kingColor) {
 
         int BOARD_SIZE = 8;
 
+        /* Checks all the places a piece can go. If any of the pieces can 
+        go to the tile containing the opposite-color king, then the king is in check */
         for (int row=0; row < BOARD_SIZE; row++ ) {
             for (int col=0; col < BOARD_SIZE; col++) {
 
@@ -354,7 +401,8 @@ public class ChessModel {
                 pieceCoordinates[0] = row;
                 pieceCoordinates[1] = col;
 
-                if (ChessLib.isCoordinatesInArrayList(getKingCoordinates(boardIn, getTurnColor()), piece.possibleMovesList(boardIn, pieceCoordinates))) {
+                // Checks if the opposite king's coordinates is contained in any of the list of moves a piece could make
+                if (ChessLib.isCoordinatesInArrayList(getKingCoordinates(boardIn, kingColor), piece.possibleMovesList(boardIn, pieceCoordinates))) {
                     return true;
                 }
             }
@@ -368,6 +416,7 @@ public class ChessModel {
         int[] kingCoordinates = new int[2];
 
         int BOARD_SIZE = 8;
+        // Checks all the coordinates on the board until it finds the coordinates that contain the desired king
         for (int row=0; row < BOARD_SIZE; row++) {
             for (int col=0; col < BOARD_SIZE; col++) {
 
@@ -375,6 +424,7 @@ public class ChessModel {
 
                     kingCoordinates[0] = row;
                     kingCoordinates[1] = col;
+                    return kingCoordinates;
                 }
             }
         }
@@ -384,16 +434,19 @@ public class ChessModel {
 
     public void flipBoard(ChessPiece[][] boardIn) {
 
+        // Reverses the order within each row
         for (ChessPiece[] row : boardIn) {
 
             Collections.reverse(Arrays.asList(row));
         }
 
+        // Reverses of the order between rows
         Collections.reverse(Arrays.asList(boardIn));
     }
 
     public void resetModelProperties() {
 
+        // Resets all the model properties to their initial state
         moveStep = 0;
         steps = new int[2][2];
         board = ChessLib.initializeBoard();

@@ -38,12 +38,12 @@ public class ChessView extends JFrame {
     private String gameStatus = "LewisChess         "; // Message showing check, checkmate, or current turn
     private ChessPiece convertedPiece; // If a pawn reaches end of board, it gets converted to the chosen type
     private Container contentPane = getContentPane(); // Content the JFrame will ultimately display
-    private ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>(); // List of white pieces lost
-    private ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>(); // List of black pieces lost
+    public ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>(); // List of white pieces lost
+    public ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>(); // List of black pieces lost
     private ChessPiece selectedPiece;
     public boolean isResetClicked = false; // If reset is clicked, the board is reset to the initial state
     public boolean isPawnAtEnd = false; // If a pawn reaches the end, new piece options are displayed
-    public boolean boardIsReadyToFlip = false;
+    public boolean isBoardFlipping = false;
     ActionListener listenerForBoardClick; // The controller that will listen to the button click
 
     // Getters
@@ -81,11 +81,11 @@ public class ChessView extends JFrame {
         // Removes all the panels so that the new ones replace them
         remove(boardPanel);
         remove(northPanel);
+        remove(eastPanel);
+        remove(westPanel);
         remove(contentPane);
         remove(gameStatusPanel);
         remove(optionsPanel);
-        remove(westPanel);
-        remove(eastPanel);
         remove(resetButtonPanel);
         remove(southPanel);
         remove(gamePanel);
@@ -125,15 +125,16 @@ public class ChessView extends JFrame {
             // Adds the latest lost white piece to the east panel
             eastPanel.add(lostWhitePiece);
         }
-
+        
         // Sets up west panel display
         westPanel.setLayout(new GridLayout(8,2));
         westPanel.setPreferredSize(new Dimension(110, 100));
         westPanel.setBackground(new Color(165,185, 210));
         for (Tile lostBlackPiece : lostBlackPieces) {
-            // Adds the latest lost black piece to the east panel
+            // Adds the latest lost black piece to the west panel
             westPanel.add(lostBlackPiece);
         }
+            
 
         // Panel containing the board
         boardPanel.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
@@ -206,24 +207,24 @@ public class ChessView extends JFrame {
                     }
                 }
 
-                // Adds piece from the 2d piece array to the current tile and colors the tile appropriately
+                // Adds piece from the 2D piece array to the current tile and colors the tile appropriately
                 newTile = new Tile(boardIn[row][col], tileColor);
 
                 // Sets the coordinates for the tile
                 newTile.setRowCoordinate(row);
                 newTile.setColCoordinate(col);
 
+                
+
                 // Adds tile to the array list of tiles and to the board panel
                 tileList.add(newTile);
                 boardPanel.add(newTile);
-        }
 
-        /* If a pawn reaches the end, the board becomes unresponsive until that pawn is converted. 
-        If its checkmate, it becomes permanently unresponsive until the game is reset */
-
-        if (!isPawnAtEnd && !getGameStatus().contains("Checkmate") && !boardIsReadyToFlip) {
-            for (Tile tile : tileList) {
-                addMoveListener(tile);
+                /* If a pawn reaches the end, the board becomes unresponsive until that pawn is converted. 
+                If its checkmate, it becomes permanently unresponsive until the game is reset */
+                if (!isPawnAtEnd && !getGameStatus().contains("Checkmate") && !isBoardFlipping) {
+          
+                    addTileListener(newTile);
             }
         }
 
@@ -232,7 +233,7 @@ public class ChessView extends JFrame {
     }
     }
 
-    public void addMoveListener(Tile tileIn) {
+    public void addTileListener(Tile tileIn) {
 
         tileIn.getTileButton().addActionListener(listenerForBoardClick);
 
@@ -257,6 +258,11 @@ public class ChessView extends JFrame {
         tileIn.getTileButton().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
+
+                try {
+                    ChessLib.playAudio("ChessData/buttonClicked.wav");
+                } catch (Exception ex) {}
+
                 convertedPiece = pieceFactory.createPiece(tileIn.getPiece().getType(), tileIn.getPiece().getColor());
             }
         });
@@ -264,7 +270,7 @@ public class ChessView extends JFrame {
 
 
     // Adds listener for the board clicks
-    public void addMoveListener(ActionListener listenerForBoardClick) {
+    public void addTileListener(ActionListener listenerForBoardClick) {
 
         // sets the board click listener property to the inputted listener
         this.listenerForBoardClick = listenerForBoardClick;
@@ -301,7 +307,7 @@ public class ChessView extends JFrame {
         lostWhitePieces = new ArrayList<Tile>();
         lostBlackPieces = new ArrayList<Tile>();
         isResetClicked = false;
-        boardIsReadyToFlip = false;
+        isBoardFlipping = false;
     }
 
     // Creates the options panel and returns it
@@ -316,26 +322,20 @@ public class ChessView extends JFrame {
 
         /* If a piece moves, the turn is usually over. However, if a pawn reaches the end, the
         turn is not over because the pawn must be converted. So, the turn must be switched back. */
-        switch(turnColor) {
-            case "White":
-                turnColor = "Black";
-                break;
-            case "Black":
-                turnColor = "White";
-                break;
-        }
+    
+        String pieceColor = ChessLib.flipTurnColor(getTurnColor());
 
         // Adds listener to each option so that it can be selected.
-        Tile rookTile = new Tile(pieceFactory.createPiece("Rook", turnColor), new Color(255,255, 255));
+        Tile rookTile = new Tile(pieceFactory.createPiece("Rook", pieceColor), new Color(255,255, 255));
         addPawnConversionListener(rookTile);
 
-        Tile knightTile = new Tile(pieceFactory.createPiece("Knight", turnColor), new Color(255,255, 255));
+        Tile knightTile = new Tile(pieceFactory.createPiece("Knight", pieceColor), new Color(255,255, 255));
         addPawnConversionListener(knightTile);
 
-        Tile bishopTile = new Tile(pieceFactory.createPiece("Bishop", turnColor), new Color(255,255, 255));
+        Tile bishopTile = new Tile(pieceFactory.createPiece("Bishop", pieceColor), new Color(255,255, 255));
         addPawnConversionListener(bishopTile);
 
-        Tile queenTile = new Tile(pieceFactory.createPiece("Queen", turnColor), new Color(255,255, 255));
+        Tile queenTile = new Tile(pieceFactory.createPiece("Queen", pieceColor), new Color(255,255, 255));
         addPawnConversionListener(queenTile);
 
         // Adds the options to the options panel (rook, knight, bishop, queen)
@@ -393,16 +393,23 @@ public class ChessView extends JFrame {
             resetButton.setBackground(Color.LIGHT_GRAY);
             resetButton.setBorder(BorderFactory.createEmptyBorder());
 
-            // Adds listener so that the controller knows when the reset button is clicked
-            resetButton.addActionListener(listenerForBoardClick);
-            resetButton.addActionListener(new ActionListener() {
+            // Cannot select the reset button as the board is flipping
+            if (!isBoardFlipping) {
+                // Adds listener so that the controller knows when the reset button is clicked
+                resetButton.addActionListener(listenerForBoardClick);
+                resetButton.addActionListener(new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(ActionEvent e) {
 
-                    // If reset is clicked, the boolean isResetClicked is set to true so that the controller hands it
-                    isResetClicked = true;
-                }
-            });
+                        try {
+                            ChessLib.playAudio("ChessData/buttonClicked.wav");
+                        } catch (Exception ex) {}
+
+                        // If reset is clicked, the boolean isResetClicked is set to true so that the controller hands it
+                        isResetClicked = true;
+                    }
+                });
+            }
 
             add(resetButton);
         }
