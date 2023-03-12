@@ -1,12 +1,5 @@
-
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.event.SwingPropertyChangeSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 
 public class ChessController {
     
@@ -31,10 +24,9 @@ public class ChessController {
 
             /* Once a pawn reaches the end, only the options panel can interact with the controller.
             Once the pawn has been converted to the desired piece, moves can be made again. */
-            if (theView.isPawnAtEnd && !theView.isBoardFlipping) {
+            if (theView.isPawnAtEnd && !theView.isBoardFlipping && !theView.isResetClicked) {
                 final int BOTTOM_ROW_INDEX = 7;
                 theModel.getBoard()[BOTTOM_ROW_INDEX][7 - selectedTileCoordinates[1]] = theView.getConvertedPiece();
-                System.out.println(theView.getConvertedPiece());
                 theModel.checkStatus(theModel.getBoard());
                 theModel.isPawnAtEnd = false;
             }
@@ -63,7 +55,9 @@ public class ChessController {
             theView.setGameStatus(theModel.getGameStatus());
 
             // Displays the board according to the model's logic
-            theView.displayBoard(theModel.getBoard());
+            if (!theView.isResetClicked) {
+                theView.displayBoard(theModel.getBoard());
+            }
 
             // Flips the board after a move is made
             if (theModel.isPlacementValid) {
@@ -83,6 +77,7 @@ public class ChessController {
                         theView.isBoardFlipping = false;
                         theModel.flipBoard(theModel.getBoard());
                         theView.displayBoard(theModel.getBoard());
+                        
                     }
                 });
     
@@ -92,6 +87,7 @@ public class ChessController {
 
             // If the reset button is clicked, reset all the properties for the model and view and display the new board
             if (theView.isResetClicked && !theView.isBoardFlipping) {
+                System.out.println("h");
                 theModel.resetModelProperties();
                 theView.resetViewProperties();
                 theView.displayBoard(theModel.getBoard());

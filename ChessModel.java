@@ -1,13 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.event.SwingPropertyChangeSupport;
-
 import java.awt.Color;
-import java.io.IOException;
+
 
 public class ChessModel {
 
@@ -72,11 +67,12 @@ public class ChessModel {
                     isPlacementValid = true;
                 }
             }
-
         } 
 
         // Places the selected piece in the valid destination that was selected
         if (isPlacementValid) {
+
+            selectedPiece.isUnmoved = false;
 
             ChessLib.playAudio("ChessData/pieceMoved.wav");
 
@@ -407,6 +403,7 @@ public class ChessModel {
         // Checks all the coordinates on the board until it finds the coordinates that contain the desired king
         for (int row=0; row < BOARD_SIZE; row++) {
             for (int col=0; col < BOARD_SIZE; col++) {
+
 
                 if (boardIn[row][col].getType() == "King" && boardIn[row][col].getColor() == pieceColor) {
 

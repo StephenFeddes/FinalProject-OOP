@@ -289,25 +289,6 @@ public class ChessView extends JFrame {
         }
     }
 
-    // Resets the properties of the view
-    public void resetViewProperties() {
-
-        tileList = new ArrayList<Tile>();
-        board = ChessLib.initializeBoard();
-        availableTilesList = new ArrayList<int[]>();
-    
-        
-        turnColor = "White";
-        selectedTileCoordinates = new int[2];
-        gameStatus = "LewisChess         ";
-        convertedPiece = null;
-        isPawnAtEnd = false;
-        lostWhitePieces = new ArrayList<Tile>();
-        lostBlackPieces = new ArrayList<Tile>();
-        isResetClicked = false;
-        isBoardFlipping = false;
-    }
-
     // Creates the options panel and returns it
     JPanel createOptionsPanel(String turnColor) {
 
@@ -411,5 +392,24 @@ public class ChessView extends JFrame {
 
             add(resetButton);
         }
+    }
+
+    // Resets the properties of the view
+    public void resetViewProperties() {
+
+        tileList = new ArrayList<Tile>();
+        board = ChessLib.initializeBoard();
+        availableTilesList = new ArrayList<int[]>();
+    
+        
+        turnColor = "White";
+        selectedTileCoordinates = new int[2];
+        gameStatus = "LewisChess         ";
+        convertedPiece = null;
+        isPawnAtEnd = false;
+        lostWhitePieces = new ArrayList<Tile>();
+        lostBlackPieces = new ArrayList<Tile>();
+        isResetClicked = false;
+        isBoardFlipping = false;
     }
 }
