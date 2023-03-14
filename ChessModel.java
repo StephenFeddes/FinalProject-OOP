@@ -318,12 +318,9 @@ public class ChessModel {
 
                 // If the current player cannot move, then the other player has the winning color (white or black)
                 String winningColor = ChessLib.flipTurnColor(getTurnColor());
-
+                
+                ChessLib.playAudio("ChessData/gameOver.wav");
                 setGameStatus(String.format("Checkmate: %s wins                  ", winningColor));
-
-        
-                ChessLib.playAudio("ChessData/checkMate.wav");
-
 
             } else if (cantMove) {
 

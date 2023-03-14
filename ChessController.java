@@ -24,20 +24,21 @@ public class ChessController {
             Thread whiteClockThread = null;
 
         public void actionPerformed(ActionEvent e) {
-            
+
             int[] selectedTileCoordinates = theView.getSelectedTileCoordinates(); // Tile coordinates of the last tile clicked
 
             /* Once a pawn reaches the end, only the options panel can interact with the controller.
             Once the pawn has been converted to the desired piece, moves can be made again. */
             if (theView.isPawnAtEnd && !theView.isBoardFlipping && !theView.isResetClicked) {
-                final int BOTTOM_ROW_INDEX = 7;
-                theModel.getBoard()[BOTTOM_ROW_INDEX][7 - selectedTileCoordinates[1]] = theView.getConvertedPiece();
+                final int TOP_ROW_INDEX = 0;
+                theModel.getBoard()[TOP_ROW_INDEX][selectedTileCoordinates[1]] = theView.getConvertedPiece();
                 theModel.checkStatus(theModel.getBoard());
                 theModel.flipBoard(theModel.getBoard());
                 theModel.isPawnAtEnd = false;
             }
 
             if (theView.isFirstTurn) {
+            
                 theModel.setTurnColor(theView.getTurnColor());
                 theModel.setBoard(ChessLib.initializeBoard(theModel.getTurnColor()));
                 theModel.setGameStatus(String.format("%s's turn        ", theModel.getTurnColor()));
@@ -46,18 +47,15 @@ public class ChessController {
             // Takes the selected tile coordinates and gives it to the model to run chess logic on
             theModel.addMove(selectedTileCoordinates);
 
-            // Model informs the view whose turn it is so that the view can display that fact
-            theView.setTurnColor(theModel.getTurnColor());
-
             // Gets what the model considers to be the selected piece and informs the view
             theView.setSelectedPiece(theModel.getSelectedPiece());
     
-            if (theModel.getTurnColor() == "White" && theView.isTimerOn && !theView.isResetClicked && theModel.moveStep == 0 && !theView.getSelectedPiece().getType().equals("Empty") && !theModel.isPawnAtEnd || theView.isFirstTurn) {
+            boolean isCheckmate = theModel.getGameStatus().contains("Checkmate");
+            if ((theModel.getTurnColor() == "White" && !isCheckmate && !theView.isResetClicked && theModel.moveStep == 0 && !theView.getSelectedPiece().getType().equals("Empty") && !theModel.isPawnAtEnd || theView.isFirstTurn) && theView.isTimerOn) {
                 whiteClockThread = new Thread(new TimerRunnable("White"));
                 whiteClockThread.start();
             } 
-            
-            if (theModel.getTurnColor() == "Black" && theView.isTimerOn && !theView.isResetClicked && theModel.moveStep == 0 && !theView.getSelectedPiece().getType().equals("Empty") && !theModel.isPawnAtEnd || theView.isFirstTurn) {
+            if ((theModel.getTurnColor() == "Black" && !isCheckmate && !theView.isResetClicked && theModel.moveStep == 0 && !theView.getSelectedPiece().getType().equals("Empty") && !theModel.isPawnAtEnd || theView.isFirstTurn) && theView.isTimerOn) {
                 blackClockThread = new Thread(new TimerRunnable("Black"));
                 blackClockThread.start();
             } 
@@ -66,7 +64,9 @@ public class ChessController {
             theView.setLostBlackPieces(theModel.getLostBlackPieces());
             theView.setLostWhitePieces(theModel.getLostWhitePieces());
 
-            theView.setTurnColor(theModel.getTurnColor()); // Model notifies the view whose turn it is now
+            if (!theModel.getTurnColor().equals("Null")) {
+                theView.setTurnColor(theModel.getTurnColor()); // Model notifies the view whose turn it is now
+            }
 
             theView.isPawnAtEnd = theModel.isPawnAtEnd; // Model notifies the view a pawn has reached the end of the board
 
@@ -85,12 +85,11 @@ public class ChessController {
             if (theModel.isPlacementValid & !theModel.isPawnAtEnd) {
                 
                 theView.isBoardFlipping = true;
-                theView.displayBoard(theModel.getBoard());
 
                 Thread boardFlipThread = new Thread(new Runnable() {
 
                     public void run() {
-    
+
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {}
@@ -111,14 +110,12 @@ public class ChessController {
 
                 theModel.resetModelProperties();
                 theView.resetViewProperties();
-                
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {}
+            
+                blackClockThread.interrupt();
+                whiteClockThread.interrupt();
                 theView.blackClockPanel.seconds = theView.getInitialSecondsLeft();
                 theView.whiteClockPanel.seconds = theView.getInitialSecondsLeft();
                 theView.displayBoard(theModel.getBoard());
-
             } 
         }
     }
@@ -137,25 +134,53 @@ public class ChessController {
 
                 if (timeColor == "White") {
 
-                    while (theView.whiteClockPanel.seconds > 0 && theModel.getTurnColor() == "White") {
+                    while (theView.whiteClockPanel.seconds > 0 && theModel.getTurnColor() == "White" && !Thread.interrupted()) {
 
                         try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {}
 
-                        secondsLeft = theView.whiteClockPanel.seconds - 1;
-                        theView.whiteClockPanel.updateSeconds(secondsLeft);
+                            Thread.sleep(1000);
+                        
+                            secondsLeft = theView.whiteClockPanel.seconds - 1;
+                            theView.whiteClockPanel.updateSeconds(secondsLeft);
+                            if (secondsLeft  < 100) {
+                                ChessLib.playAudio("ChessData/clockTick.wav");
+                            }
+
+                            if (secondsLeft == 0) {
+
+                                theView.isTimerOver = true;
+                                theView.setGameStatus("Out of time: Black wins              ");
+                                theView.displayBoard(theModel.getBoard());
+                                ChessLib.playAudio("ChessData/gameOver.wav");
+                                theModel.setTurnColor("Null");
+                                break;
+                            }
+                        } catch (InterruptedException e) {}
                     }
                 } else if (timeColor == "Black") {
 
-                    while (theView.blackClockPanel.seconds > 0 && theModel.getTurnColor() == "Black") {
+                    while (theView.blackClockPanel.seconds > 0 && theModel.getTurnColor() == "Black" && !Thread.interrupted()) {
 
                         try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {}
 
-                        secondsLeft = theView.blackClockPanel.seconds - 1;
-                        theView.blackClockPanel.updateSeconds(secondsLeft);
+                            Thread.sleep(1000);
+                        
+                            secondsLeft = theView.blackClockPanel.seconds - 1;
+                            theView.blackClockPanel.updateSeconds(secondsLeft);
+                            if (secondsLeft  < 100) {
+                                ChessLib.playAudio("ChessData/clockTick.wav");
+                            }
+
+                            if (secondsLeft == 0) {
+
+                                theView.isTimerOver = true;
+                                theView.setGameStatus("Out of time: Black wins              ");
+                                theView.displayBoard(theModel.getBoard());
+                                ChessLib.playAudio("ChessData/gameOver.wav");
+                                theModel.setTurnColor("Null");
+                                break;
+                            }
+                        } catch (InterruptedException e) {}
                     }
                 }
             }

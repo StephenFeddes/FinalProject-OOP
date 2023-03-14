@@ -29,7 +29,7 @@ public class ChessView extends JFrame {
     private JPanel gamePanel = new JPanel(); 
     private JPanel gameStatusPanel = new JPanel();
     private JPanel optionsPanel = new JPanel(); 
-    private JPanel resetButtonPanel = new JPanel();
+    public ResetButtonPanel resetButtonPanel = new ResetButtonPanel();
     private JPanel gameMenuPanel = new JPanel();
     private ArrayList<Tile> tileList = new ArrayList<Tile>(); // List of tiles in the current board
     private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE]; // 2D array of the board's pieces
@@ -55,7 +55,7 @@ public class ChessView extends JFrame {
     public boolean gameOn = false;
     public boolean isFirstTurn = true;
     public boolean isTimerOn = true;
-    public boolean isGameOver = false;
+    public boolean isTimerOver = false;
     public ActionListener controllerListener; // The controller that will listen to the button click
 
     // Getters
@@ -259,8 +259,6 @@ public class ChessView extends JFrame {
                 newTile.setRowCoordinate(row);
                 newTile.setColCoordinate(col);
 
-                
-
                 // Adds tile to the array list of tiles and to the board panel
                 if (gameOn) {
                     tileList.add(newTile);
@@ -269,7 +267,7 @@ public class ChessView extends JFrame {
 
                 /* If a pawn reaches the end, the board becomes unresponsive until that pawn is converted. 
                 If its checkmate, it becomes permanently unresponsive until the game is reset */
-                if (!isPawnAtEnd && !getGameStatus().contains("Checkmate") && !isBoardFlipping) {
+                if (!isPawnAtEnd && !getGameStatus().contains("Checkmate") && !isBoardFlipping && !isTimerOver) {
           
                     addTileListener(newTile);
             }
@@ -344,10 +342,11 @@ public class ChessView extends JFrame {
         isPawnAtEnd = false;
         lostWhitePieces = new ArrayList<Tile>();
         lostBlackPieces = new ArrayList<Tile>();
-        isResetClicked = false;
+        //isResetClicked = false;
         isBoardFlipping = false;
         gameOn = false;
         isFirstTurn = true;
+        isTimerOver = false;
     }
 
     // Creates the options panel and returns it
@@ -480,8 +479,8 @@ public class ChessView extends JFrame {
                     ChessLib.playAudio("ChessData/buttonClicked.wav");
 
                     initialSecondsLeft -= 300; // Decrements 5 minutes
-                    if (initialSecondsLeft < 0) {
-                        initialSecondsLeft = 0;
+                    if (initialSecondsLeft <= 0) {
+                        initialSecondsLeft = 300;
                     }
                     blackSecondsLeft = initialSecondsLeft; 
                     whiteSecondsLeft = initialSecondsLeft;
@@ -547,6 +546,7 @@ public class ChessView extends JFrame {
                     }
                    
                     setBoard(ChessLib.initializeBoard(getTurnColor()));
+                    isResetClicked = false;
                     displayBoard(getBoard());
                 }
             });
