@@ -30,23 +30,38 @@ public class ChessView extends JFrame {
     private JPanel gameStatusPanel = new JPanel();
     private JPanel optionsPanel = new JPanel(); 
     private JPanel resetButtonPanel = new JPanel();
+    private JPanel gameMenuPanel = new JPanel();
     private ArrayList<Tile> tileList = new ArrayList<Tile>(); // List of tiles in the current board
     private ChessPiece[][] board = new ChessPiece[BOARD_SIZE][BOARD_SIZE]; // 2D array of the board's pieces
     private ArrayList<int[]> availableTilesList = new ArrayList<int[]>(); // List of tiles a player's selected piece can go or selected
     private String turnColor = "White";  // String indicating whose turn it currently is
     private int[] selectedTileCoordinates = new int[2]; // Coordinates of the last board tile the user clicked on
-    private String gameStatus = "LewisChess         "; // Message showing check, checkmate, or current turn
+    private String gameStatus; // Message showing check, checkmate, or current turn
     private ChessPiece convertedPiece; // If a pawn reaches end of board, it gets converted to the chosen type
     private Container contentPane = getContentPane(); // Content the JFrame will ultimately display
+    private ChessPiece selectedPiece;
+    private int whiteSecondsLeft = 1800; // Standard amount of seconds for a player
+    private int blackSecondsLeft = 1800;
+    private int initialSecondsLeft = 1800;
+    private String firstPlayer = "White";
+    public MenuButton beginButton = new MenuButton("");
     public ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>(); // List of white pieces lost
     public ArrayList<Tile> lostBlackPieces = new ArrayList<Tile>(); // List of black pieces lost
-    private ChessPiece selectedPiece;
+    public ClockPanel whiteClockPanel = new ClockPanel("White");
+    public ClockPanel blackClockPanel = new ClockPanel("Black");
     public boolean isResetClicked = false; // If reset is clicked, the board is reset to the initial state
     public boolean isPawnAtEnd = false; // If a pawn reaches the end, new piece options are displayed
     public boolean isBoardFlipping = false;
-    ActionListener listenerForBoardClick; // The controller that will listen to the button click
+    public boolean gameOn = false;
+    public boolean isFirstTurn = true;
+    public boolean isTimerOn = true;
+    public boolean isGameOver = false;
+    public ActionListener controllerListener; // The controller that will listen to the button click
 
     // Getters
+    public int getInitialSecondsLeft() { return initialSecondsLeft; }
+    public int getWhiteSecondsLeft() { return whiteSecondsLeft; }
+    public int getBlackSecondsLeft() { return blackSecondsLeft; }
     public ChessPiece getSelectedPiece() { return selectedPiece; }
     public ChessPiece getConvertedPiece() { return convertedPiece; }
     public String getTurnColor() { return turnColor; }
@@ -55,6 +70,10 @@ public class ChessView extends JFrame {
     public int[] getSelectedTileCoordinates() { return selectedTileCoordinates; }
 
     // Setters
+    public void setInitialSecondsLeft(int initialSecondsLeft) { this.initialSecondsLeft = initialSecondsLeft; }
+    public void setWhiteSecondsLeft(int whiteSecondsLeft) { this.whiteSecondsLeft = whiteSecondsLeft; }
+    public void setBlackSecondsLeft(int blackSecondsLeft) { this.blackSecondsLeft = blackSecondsLeft; }
+    public void setBoard(ChessPiece[][] boardIn) { board = boardIn; }
     public void setSelectedPiece(ChessPiece selectedPiece) {this.selectedPiece = selectedPiece; }
     public void setLostWhitePieces(ArrayList<Tile> lostWhitePieces) { this.lostWhitePieces = lostWhitePieces; }
     public void setLostBlackPieces(ArrayList<Tile> lostBlackPieces) { this.lostBlackPieces = lostBlackPieces; }
@@ -64,7 +83,7 @@ public class ChessView extends JFrame {
 
     public ChessView() {
         
-        board = ChessLib.initializeBoard(); // 
+        //board = ChessLib.initializeBoard(); // 
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -86,7 +105,9 @@ public class ChessView extends JFrame {
         remove(contentPane);
         remove(gameStatusPanel);
         remove(optionsPanel);
+        remove(optionsPanel);
         remove(resetButtonPanel);
+        remove(gameMenuPanel);
         remove(southPanel);
         remove(gamePanel);
         tileList.clear(); // Removes all tiles in the previous tile list so that new ones replace them
@@ -98,8 +119,9 @@ public class ChessView extends JFrame {
         westPanel = new JPanel(); 
         boardPanel = new JPanel(); // Panel containing the board
         gamePanel = new JPanel(); // Panel containing the boardPanel, northPanel, etc.
-        gameStatusPanel = new gameStatusPanel(); // Panel that is contained by the north panel. Provides game messages
+        gameStatusPanel = new GameStatusPanel(); // Panel that is contained by the north panel. Provides game messages
         optionsPanel = createOptionsPanel(getTurnColor());
+        gameMenuPanel = new GameMenuPanel();
 
         // Sets up north panel display
         northPanel.setLayout(new BorderLayout());
@@ -109,6 +131,9 @@ public class ChessView extends JFrame {
         if (isPawnAtEnd) {
             // If a pawn reaches the end, the piece options panel is displayed in the north panel
             northPanel.add(optionsPanel, BorderLayout.CENTER);
+        }
+        if (!gameOn) {
+            northPanel.add(gameMenuPanel);
         }
 
         // Sets up south panel display
@@ -144,16 +169,33 @@ public class ChessView extends JFrame {
         // Panel containing all the panels, such as the board, south panel, etc
         gamePanel.setLayout(new BorderLayout());
         Dimension screenSize = Toolkit.getDefaultToolkit(). getScreenSize();
-        gamePanel.setBounds((int)screenSize.getWidth()/4,0, 700, 650);
+        gamePanel.setBounds((int)screenSize.getWidth()/4 - 8, 0,  700, 650);
         gamePanel.add(northPanel, BorderLayout.NORTH);
         gamePanel.add(southPanel, BorderLayout.SOUTH);
         gamePanel.add(eastPanel, BorderLayout.EAST);
         gamePanel.add(westPanel, BorderLayout.WEST);
-        gamePanel.add(boardPanel, BorderLayout.CENTER);
+        if (gameOn) {
+            gamePanel.add(boardPanel, BorderLayout.CENTER);
+        } else {
+            gamePanel.add(new JPanel() { protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                int panelWidth = getWidth();
+                int panelHeight = getHeight();
+                final int FONT_SIZE = 40;
+
+                setBackground(new Color(255, 255, 255));
+        
+                g.setColor(new Color(125,0,0));
+                g.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+                g.drawString("LewisChess         ", panelWidth/2 - "LewisChess         ".length()/2 * FONT_SIZE/4, panelHeight/2);
+            }}, BorderLayout.CENTER);
+        }
 
         // Content that the JFrame will display
         contentPane.setLayout(null);
-        contentPane.add(gamePanel, BorderLayout.CENTER); // Adds the whole game panel to the center
+        contentPane.add(gamePanel); // Adds the whole game panel to the center
+        contentPane.add(blackClockPanel);
+        contentPane.add(whiteClockPanel);
         contentPane.setBackground(new Color(125,0,0));
 
         Color tileColor;
@@ -162,6 +204,9 @@ public class ChessView extends JFrame {
         // Creates each tile by coloring it and putting a piece on it
         // Adds the tiles to be displayed to the board panel
         for (int row=0; row < BOARD_SIZE; row++) {
+            if (!gameOn) {
+                break;
+            }
             for(int col=0; col < BOARD_SIZE; col++) {
 
                 tileCoordinates[0] = row;
@@ -217,8 +262,10 @@ public class ChessView extends JFrame {
                 
 
                 // Adds tile to the array list of tiles and to the board panel
-                tileList.add(newTile);
-                boardPanel.add(newTile);
+                if (gameOn) {
+                    tileList.add(newTile);
+                    boardPanel.add(newTile);
+                }
 
                 /* If a pawn reaches the end, the board becomes unresponsive until that pawn is converted. 
                 If its checkmate, it becomes permanently unresponsive until the game is reset */
@@ -227,15 +274,14 @@ public class ChessView extends JFrame {
                     addTileListener(newTile);
             }
         }
-
-    // Redisplays the JFrame
-        SwingUtilities.updateComponentTreeUI(this);
     }
+        // Redisplays the JFrame
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     public void addTileListener(Tile tileIn) {
 
-        tileIn.getTileButton().addActionListener(listenerForBoardClick);
+        tileIn.getTileButton().addActionListener(controllerListener);
 
         tileIn.getTileButton().addActionListener( new ActionListener() {
 
@@ -246,13 +292,34 @@ public class ChessView extends JFrame {
         });
     }
 
+    // Adds listener for the board clicks
+    public void addTileListener(ActionListener listenerForTileClick) {
+
+        // sets the board click listener property to the inputted listener
+        this.controllerListener = listenerForTileClick;
+
+        for (Tile tile : tileList) {
+
+            // Adds listener to the tile
+            tile.getTileButton().addActionListener(listenerForTileClick);
+
+            // Adds anonymous listener that sets the selectedTileCoordinates to the tile that was selected
+            tile.getTileButton().addActionListener( new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    selectedTileCoordinates[0] = tile.getRowCoordinate();
+                    selectedTileCoordinates[1] = tile.getColCoordinate();
+                }
+            });
+        }
+    }
 
     // Adds actions listeners for the options panel
     public void addPawnConversionListener(Tile tileIn) {
         PieceFactory pieceFactory = new PieceFactory();
 
         // Controller listens for an option click
-        tileIn.getTileButton().addActionListener(listenerForBoardClick);
+        tileIn.getTileButton().addActionListener(controllerListener);
 
         // Converts the pawn to the selected piece (knight, bishop, rook, queen)
         tileIn.getTileButton().addActionListener(new ActionListener() {
@@ -266,27 +333,21 @@ public class ChessView extends JFrame {
         });
     }
 
+    // Resets the properties of the view
+    public void resetViewProperties() {
 
-    // Adds listener for the board clicks
-    public void addTileListener(ActionListener listenerForBoardClick) {
-
-        // sets the board click listener property to the inputted listener
-        this.listenerForBoardClick = listenerForBoardClick;
-
-        for (Tile tile : tileList) {
-
-            // Adds listener to the tile
-            tile.getTileButton().addActionListener(listenerForBoardClick);
-
-            // Adds anonymous listener that sets the selectedTileCoordinates to the tile that was selected
-            tile.getTileButton().addActionListener( new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    selectedTileCoordinates[0] = tile.getRowCoordinate();
-                    selectedTileCoordinates[1] = tile.getColCoordinate();
-                }
-            });
-        }
+        tileList = new ArrayList<Tile>();
+        availableTilesList = new ArrayList<int[]>();
+        selectedTileCoordinates = new int[2];
+        gameStatus = null;
+        convertedPiece = null;
+        isPawnAtEnd = false;
+        lostWhitePieces = new ArrayList<Tile>();
+        lostBlackPieces = new ArrayList<Tile>();
+        isResetClicked = false;
+        isBoardFlipping = false;
+        gameOn = false;
+        isFirstTurn = true;
     }
 
     // Creates the options panel and returns it
@@ -325,11 +386,185 @@ public class ChessView extends JFrame {
 
         return newOptionsPanel;
     }
+
+    class ClockPanel extends JPanel {
+
+        int x;
+        int seconds;
+        String playerColor;
+
+        public ClockPanel(String playerColor) {
+
+            Dimension screenSize = Toolkit.getDefaultToolkit(). getScreenSize();
+            this.playerColor = playerColor;
+
+            if (playerColor == "White") {
+                x = 0;
+                seconds = getWhiteSecondsLeft();
+            } else {
+                x = (int)screenSize.getWidth() - (int)screenSize.getWidth()/4 + 8;
+                seconds = getBlackSecondsLeft();
+            }
+
+            setBounds(x, (int)screenSize.getHeight()/4, (int)screenSize.getWidth()/4-8, (int)screenSize.getHeight()/2);
+            setBackground(new Color(125, 0, 0));
+        }
+
+        public ClockPanel() {}
+
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+    
+            int panelHeight = getHeight();
+            final int FONT_SIZE = 30;
+
+            String minutesPart = "" + seconds / 60;
+            String secondsPart = "" + seconds % 60;
+            if (seconds % 60 < 10) {
+                secondsPart = "0" + secondsPart;
+            }
+            if (seconds / 60 < 10) {
+                minutesPart = "0" + minutesPart;
+            }
+            String time = minutesPart + ":" + secondsPart;
+
+            Dimension screenSize = Toolkit.getDefaultToolkit(). getScreenSize();
+            if (isTimerOn) {
+                g.setColor(new Color(255 ,255,255));
+            } else {
+                g.setColor(new Color(125, 0, 0));
+            }
+            g.fillOval(0, 0, (int)screenSize.getWidth()/4 - 8, (int)screenSize.getWidth()/4 - 8);
+            g.setColor(new Color(125,0,0));
+            g.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+            g.drawString(playerColor + "'s remaining time: ", 25, (int)screenSize.getHeight()/6);
+            g.drawString(time, (int)screenSize.getWidth()/8 - 40, panelHeight/2);
+        }
+
+        public void updateSeconds(int seconds) {
+            this.seconds = seconds;
+            repaint();
+        }
+    }
+
+    class GameMenuPanel extends JPanel {
+        
+        public GameMenuPanel() {
+            setPreferredSize(new Dimension(100, 60));
+            setLayout(new GridLayout());
+
+            MenuButton increaseTimeButton = new MenuButton("<html>" + "Increment" + "<br>" + "<center>" + "Time" + "</center>" + "</html");
+            increaseTimeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+                    ChessLib.playAudio("ChessData/buttonClicked.wav");
+
+                    initialSecondsLeft += 300; // Increments 5 minutes
+                    // Amount of seconds left cannot exceed 100 minutes
+                    if (initialSecondsLeft > 5700) {
+                        initialSecondsLeft = 5700;
+                    }
+                    blackSecondsLeft = initialSecondsLeft; 
+                    whiteSecondsLeft = initialSecondsLeft;
+
+                    blackClockPanel.updateSeconds(getBlackSecondsLeft());
+                    whiteClockPanel.updateSeconds(getWhiteSecondsLeft());
+                }
+            });
+            add(increaseTimeButton);
+
+            MenuButton decreaseTimeButton = new MenuButton("<html>" + "Decrement" + "<br>" + "<center>" + "Time" + "</center>" + "</html");
+            decreaseTimeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+                    ChessLib.playAudio("ChessData/buttonClicked.wav");
+
+                    initialSecondsLeft -= 300; // Decrements 5 minutes
+                    if (initialSecondsLeft < 0) {
+                        initialSecondsLeft = 0;
+                    }
+                    blackSecondsLeft = initialSecondsLeft; 
+                    whiteSecondsLeft = initialSecondsLeft;
+
+                    blackClockPanel.updateSeconds(getBlackSecondsLeft());
+                    whiteClockPanel.updateSeconds(getWhiteSecondsLeft());
+                }
+            });
+            add(decreaseTimeButton);
+
+            MenuButton timerButton;
+            if (isTimerOn) {
+                timerButton = new MenuButton("Timer: On");
+            } else {
+                timerButton = new MenuButton("Timer: Off");
+            }
+            timerButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+                    ChessLib.playAudio("ChessData/buttonClicked.wav");
+
+                    if (isTimerOn) {
+                        isTimerOn = false;
+                        timerButton.setText("Timer: Off");
+                        blackClockPanel.repaint();
+                        whiteClockPanel.repaint();
+                    } else {
+                        isTimerOn = true;
+                        timerButton.setText("Timer: On");
+                        blackClockPanel.repaint();
+                        whiteClockPanel.repaint();
+                    }
+                }
+            });
+            add(timerButton);
+
+            MenuButton chooseFirstColorButton = new MenuButton("<html>" + "Set turn:" + "<br>" + "<center>" + firstPlayer + "</center>" + "</html");
+            chooseFirstColorButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+
+                    ChessLib.playAudio("ChessData/buttonClicked.wav");
+
+                    setTurnColor(ChessLib.flipTurnColor(getTurnColor()));
+                    firstPlayer = getTurnColor();
+                    chooseFirstColorButton.setText("<html>" + "Set turn:" + "<br>" + "<center>" + getTurnColor() + "</center>" + "</html");
+                }
+            });
+            add(chooseFirstColorButton);
+
+            beginButton = new MenuButton("Begin");
+            beginButton.addActionListener(controllerListener);
+            beginButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+                    ChessLib.playAudio("ChessData/buttonClicked.wav");
+
+                    gameOn = true;
+                    if (getTurnColor().contains("White")) {
+                        setGameStatus("White's turn        ");
+                    } else {
+                        setGameStatus("Black's turn        ");
+                    }
+                   
+                    setBoard(ChessLib.initializeBoard(getTurnColor()));
+                    displayBoard(getBoard());
+                }
+            });
+            add(beginButton);
+        }
+    }
+
+    public void addBeginButtonListener(ActionListener listenerForBeginButton) {
+
+        this.controllerListener = listenerForBeginButton;
+        beginButton.addActionListener(listenerForBeginButton);
+    }
+    
     
     // Panel indicating the games status, such as whose turn it is, whose in check, etc
-    class gameStatusPanel extends JPanel {
+    class GameStatusPanel extends JPanel {
 
-        gameStatusPanel() {
+        GameStatusPanel() {
             setPreferredSize(new Dimension(100, 60));
             setBackground(new Color(165,185, 210));
         }
@@ -359,6 +594,15 @@ public class ChessView extends JFrame {
         }
     }
 
+    class MenuButton extends JButton {
+
+        public MenuButton(String buttonText) {
+            super(buttonText);
+            setBackground(Color.LIGHT_GRAY);
+            setBorder(BorderFactory.createBevelBorder(5));
+        }
+    }
+
     class ResetButtonPanel extends JPanel {
 
         ResetButtonPanel() {
@@ -367,7 +611,7 @@ public class ChessView extends JFrame {
             setBackground(new Color(125,0, 0));
 
             // Button design
-            JButton resetButton = new JButton("Reset");
+            MenuButton resetButton = new MenuButton("Reset");
             resetButton.setPreferredSize(new Dimension(75, 45));
             resetButton.setBackground(Color.LIGHT_GRAY);
             resetButton.setBorder(BorderFactory.createEmptyBorder());
@@ -375,41 +619,21 @@ public class ChessView extends JFrame {
             // Cannot select the reset button as the board is flipping
             if (!isBoardFlipping) {
                 // Adds listener so that the controller knows when the reset button is clicked
-                resetButton.addActionListener(listenerForBoardClick);
+                resetButton.addActionListener(controllerListener);
                 resetButton.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
 
-                        try {
-                            ChessLib.playAudio("ChessData/buttonClicked.wav");
-                        } catch (Exception ex) {}
+                        ChessLib.playAudio("ChessData/buttonClicked.wav");
 
                         // If reset is clicked, the boolean isResetClicked is set to true so that the controller hands it
-                        isResetClicked = true;
+                        if (gameOn) {
+                            isResetClicked = true;
+                        }
                     }
                 });
             }
-
             add(resetButton);
         }
-    }
-
-    // Resets the properties of the view
-    public void resetViewProperties() {
-
-        tileList = new ArrayList<Tile>();
-        board = ChessLib.initializeBoard();
-        availableTilesList = new ArrayList<int[]>();
-    
-        
-        turnColor = "White";
-        selectedTileCoordinates = new int[2];
-        gameStatus = "LewisChess         ";
-        convertedPiece = null;
-        isPawnAtEnd = false;
-        lostWhitePieces = new ArrayList<Tile>();
-        lostBlackPieces = new ArrayList<Tile>();
-        isResetClicked = false;
-        isBoardFlipping = false;
     }
 }

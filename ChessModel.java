@@ -6,11 +6,11 @@ import java.awt.Color;
 
 public class ChessModel {
 
-    private int moveStep = 0; // Step number of a move. A move has two steps; a selected piece and the destination
+    public int moveStep = 0; // Step number of a move. A move has two steps; a selected piece and the destination
     private int[][] steps = new int[2][2]; // Array containing the selected piece coordinates and destination coordinates
     private ChessPiece[][] board = new ChessPiece[8][8];
     private ArrayList<int[]> currentPossibleDestinationsList = new ArrayList<int[]>();
-    private String turnColor = "White";
+    private String turnColor;
     private String gameStatus = "White's turn        ";
     private ChessPiece selectedPiece;
     private ArrayList<Tile> lostWhitePieces = new ArrayList<Tile>();
@@ -34,7 +34,7 @@ public class ChessModel {
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
 
     public ChessModel() {
-        board = ChessLib.initializeBoard(); // Board is initialized when the model is constructed
+        //board = ChessLib.initializeBoard(); // Board is initialized when the model is constructed
     }
 
     public void addMove(int[] selectionCoordinates) {
@@ -434,10 +434,10 @@ public class ChessModel {
         // Resets all the model properties to their initial state
         moveStep = 0;
         steps = new int[2][2];
-        board = ChessLib.initializeBoard();
+        //board = ChessLib.initializeBoard();
         currentPossibleDestinationsList = new ArrayList<int[]>();
-        setTurnColor("White");
         gameStatus = "White's turn        ";
+        turnColor = "Null";
         isPawnAtEnd = false;
         lostWhitePieces = new ArrayList<Tile>();
         lostBlackPieces = new ArrayList<Tile>();

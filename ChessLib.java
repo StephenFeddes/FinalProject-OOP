@@ -68,18 +68,20 @@ public class ChessLib {
     }
 
     // Creates the initial chess board and returns it
-    public static ChessPiece[][] initializeBoard() {
+    public static ChessPiece[][] initializeBoard(String initialTurnColor) {
         final int BOARD_SIZE = 8;
         ChessPiece[][] initBoard = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+
+        String nextTurnColor = flipTurnColor(initialTurnColor);
     
         // Initial setup for the black pieces
-        initBoard[0][0] = initBoard[0][7] = new Rook("Black");
-        initBoard[0][1] = initBoard[0][6] = new Knight("Black");
-        initBoard[0][2] = initBoard[0][5] = new Bishop("Black");
-        initBoard[0][3] = new Queen("Black");
-        initBoard[0][4] = new King("Black");
+        initBoard[0][0] = initBoard[0][7] = new Rook(nextTurnColor);
+        initBoard[0][1] = initBoard[0][6] = new Knight(nextTurnColor);
+        initBoard[0][2] = initBoard[0][5] = new Bishop(nextTurnColor);
+        initBoard[0][3] = new Queen(nextTurnColor);
+        initBoard[0][4] = new King(nextTurnColor);
         for (int col=0; col < BOARD_SIZE; col++) {
-            initBoard[1][col] = new Pawn("Black");
+            initBoard[1][col] = new Pawn(nextTurnColor);
         }
     
         // Initial empty spaces
@@ -90,13 +92,13 @@ public class ChessLib {
         }
     
         // Initial setup for the white pieces
-        initBoard[7][0] = initBoard[7][7] = new Rook("White");
-        initBoard[7][1] = initBoard[7][6] = new Knight("White");
-        initBoard[7][2] = initBoard[7][5] = new Bishop("White");
-        initBoard[7][3] = new Queen("White");
-        initBoard[7][4] = new King("White");
+        initBoard[7][0] = initBoard[7][7] = new Rook(initialTurnColor);
+        initBoard[7][1] = initBoard[7][6] = new Knight(initialTurnColor);
+        initBoard[7][2] = initBoard[7][5] = new Bishop(initialTurnColor);
+        initBoard[7][3] = new Queen(initialTurnColor);
+        initBoard[7][4] = new King(initialTurnColor);
         for (int col=0; col < BOARD_SIZE; col++) {
-            initBoard[6][col] = new Pawn("White");
+            initBoard[6][col] = new Pawn(initialTurnColor);
         }
     
         return initBoard;
