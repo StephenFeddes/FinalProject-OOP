@@ -83,7 +83,6 @@ public class ChessController {
 
             // Flips the board after a move is made
             if (theModel.isPlacementValid & !theModel.isPawnAtEnd) {
-                
                 theView.isBoardFlipping = true;
 
                 Thread boardFlipThread = new Thread(new Runnable() {

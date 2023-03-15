@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
+import javax.swing.event.SwingPropertyChangeSupport;
+
 import java.awt.Color;
 
 
@@ -74,6 +77,13 @@ public class ChessModel {
 
             selectedPiece.isUnmoved = false;
 
+            //board[steps[0][0]][steps[0][1]].isUnmoved = false;
+
+            System.out.println(selectedPiece.getColor());
+
+            System.out.println(board[7][0].isUnmoved);
+            System.out.println(board[7][7].isUnmoved);
+
             ChessLib.playAudio("ChessData/pieceMoved.wav");
 
             // Piece, whether its the "Empty" piece or an enemy piece, whose tile becomes occupied by the selected piece
@@ -128,7 +138,6 @@ public class ChessModel {
 
             // Now that the move is over, the destinations list should be cleared
             currentPossibleDestinationsList.clear();
-            //Arrays.fill(steps, null);
 
             /* The step number resets to 0. The other player must now first select 
             a piece before they can choose a destination in their second step */
@@ -222,7 +231,7 @@ public class ChessModel {
         int queenSideRookColIndex = 0; // The column index of the white rook closest to its queen
         int queenSideDirection = -1; // Indicates if the white queen is to the east or west side of the board
         int kingSideDirection = 1; // Indicates if the white king is to the east or west side of the board
-        if (kingColor == "Black") {
+        if (kingColor.equals("Black")) {
 
             // If the selected king is black, not white, these are the appropriate numbers
             kingColIndex = 3;
@@ -237,7 +246,11 @@ public class ChessModel {
 
         /* Checks the king-side rook to see if it can be castled with the selected king. 
         If the rook can be castled, its coordinates are added to the list */
-        if (boardIn[KING_ROW_NUM][kingColIndex+kingSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingColIndex+2*kingSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
+
+        //System.out.println("king:" + boardIn[KING_ROW_NUM][kingSideRookColIndex].isUnmoved);
+        //System.out.println("queen: " + boardIn[KING_ROW_NUM][queenSideRookColIndex].isUnmoved);
+
+        if (boardIn[KING_ROW_NUM][kingColIndex+kingSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][kingColIndex+2*kingSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][kingSideRookColIndex].getType().equals("Rook") && boardIn[KING_ROW_NUM][kingSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
 
             // King cannot pass through check while it moves toward the castle
             testBoard[KING_ROW_NUM][kingColIndex+kingSideDirection] = pieceFactory.createPiece("King", kingColor);
@@ -267,8 +280,9 @@ public class ChessModel {
         }
 
         // Checks the queen-side rook to see if it can be castled with the selected king
-        if (boardIn[KING_ROW_NUM][kingColIndex+queenSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingColIndex+2*queenSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][kingColIndex+3*queenSideDirection].getType() == "Empty" && boardIn[KING_ROW_NUM][queenSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
+        if (boardIn[KING_ROW_NUM][kingColIndex+queenSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][kingColIndex+2*queenSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][kingColIndex+3*queenSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][queenSideRookColIndex].getType().equals("Rook") && boardIn[KING_ROW_NUM][queenSideRookColIndex].isUnmoved && boardIn[KING_ROW_NUM][queenSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
 
+            testBoard = ChessLib.deepCopyBoard(boardIn);
             testBoard[KING_ROW_NUM][kingColIndex+queenSideDirection] = pieceFactory.createPiece("King", kingColor);
             testBoard[KING_ROW_NUM][kingColIndex] = new Empty();
             if (!isKingInCheck(testBoard, getTurnColor())) {
