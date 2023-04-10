@@ -211,6 +211,8 @@ public class ChessView extends JFrame {
 
                 tileCoordinates[0] = row;
                 tileCoordinates[1] = col;
+                
+                // Colors the tile either beige or green
                 if (row%2 == 0) {
                     if (col%2 == 0) {
                         tileColor = new Color(200,200,150);
@@ -240,26 +242,26 @@ public class ChessView extends JFrame {
 
                     } else {
 
-                        // Colors the tile green if it is empty and tjhe
+                        // Colors the tile light green if it is empty, which means the selected piece can move there
                         tileColor = new Color(125,200,125);
                     }
 
-                    // If a rook of the same color as the current turn is available, then it means castling can happen. That rook tile should be yellow
-                    if (getSelectedPiece().getType() == "King" && boardIn[row][col].canCastle) {
+                    // If the selected piece is a king, color the rooks it can castle with yellow
+                    if (getSelectedPiece().getType().equals("King") && boardIn[row][col].canCastle) {
 
-                        // Colors the rook tile yellow if the selected king can castle with it
                         tileColor = new Color(200,200,50);
                     }
                 }
 
-                // Adds piece from the 2D piece array to the current tile and colors the tile appropriately
-                newTile = new Tile(boardIn[row][col], tileColor);
+                // Tile contains the appropriate piece from the 2D chess piece board array
+                newTile = new Tile(boardIn[row][col], tileColor); // Creates an updated tile to be displayed by the view
 
                 // Sets the coordinates for the tile
                 newTile.setRowCoordinate(row);
                 newTile.setColCoordinate(col);
 
-                // Adds tile to the array list of tiles and to the board panel
+                /* Adds tile to an ArrayList of tiles and to the board panel. The board panel displays it.
+                The Arrraylist contains the tiles that will be listened to by the controller. */
                 if (gameOn) {
                     tileList.add(newTile);
                     boardPanel.add(newTile);
@@ -269,7 +271,7 @@ public class ChessView extends JFrame {
                 If its checkmate, it becomes permanently unresponsive until the game is reset */
                 if (!isPawnAtEnd && !getGameStatus().contains("Checkmate") && !isBoardFlipping && !isTimerOver) {
           
-                    addTileListener(newTile);
+                    listenToTile(newTile);
             }
         }
     }
@@ -277,7 +279,8 @@ public class ChessView extends JFrame {
         SwingUtilities.updateComponentTreeUI(this);
     }
 
-    public void addTileListener(Tile tileIn) {
+    // Takes an input tile for the controller to listen to
+    public void listenToTile(Tile tileIn) {
 
         tileIn.getTileButton().addActionListener(controllerListener);
 
@@ -290,10 +293,10 @@ public class ChessView extends JFrame {
         });
     }
 
-    // Adds listener for the board clicks
+    // Adds listener (the controller) for the board clicks
     public void addTileListener(ActionListener listenerForTileClick) {
 
-        // sets the board click listener property to the inputted listener
+        // Sets the board click listener property to the inputted listener
         this.controllerListener = listenerForTileClick;
 
         for (Tile tile : tileList) {
@@ -310,6 +313,12 @@ public class ChessView extends JFrame {
                 }
             });
         }
+    }
+
+    public void addBeginButtonListener(ActionListener listenerForBeginButton) {
+
+        this.controllerListener = listenerForBeginButton;
+        beginButton.addActionListener(listenerForBeginButton);
     }
 
     // Adds actions listeners for the options panel
@@ -386,6 +395,7 @@ public class ChessView extends JFrame {
         return newOptionsPanel;
     }
 
+    // Panel used for displaying the game's clocks
     class ClockPanel extends JPanel {
 
         int x;
@@ -436,7 +446,7 @@ public class ChessView extends JFrame {
             g.fillOval(0, 0, (int)screenSize.getWidth()/4 - 8, (int)screenSize.getWidth()/4 - 8);
             g.setColor(new Color(125,0,0));
             g.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-            g.drawString(playerColor + "'s remaining time: ", 25, (int)screenSize.getHeight()/6);
+            g.drawString(playerColor + "'s remaining time: ", 12, (int)screenSize.getHeight()/6);
             g.drawString(time, (int)screenSize.getWidth()/8 - 40, panelHeight/2);
         }
 
@@ -446,6 +456,7 @@ public class ChessView extends JFrame {
         }
     }
 
+    // Panel containing the options a player can choose before beginning a game
     class GameMenuPanel extends JPanel {
         
         public GameMenuPanel() {
@@ -554,13 +565,6 @@ public class ChessView extends JFrame {
         }
     }
 
-    public void addBeginButtonListener(ActionListener listenerForBeginButton) {
-
-        this.controllerListener = listenerForBeginButton;
-        beginButton.addActionListener(listenerForBeginButton);
-    }
-    
-    
     // Panel indicating the games status, such as whose turn it is, whose in check, etc
     class GameStatusPanel extends JPanel {
 
@@ -594,6 +598,7 @@ public class ChessView extends JFrame {
         }
     }
 
+    // Generic menu button. Other buttons inherit from it so that they look similar.
     class MenuButton extends JButton {
 
         public MenuButton(String buttonText) {
@@ -603,6 +608,7 @@ public class ChessView extends JFrame {
         }
     }
 
+    // Panel containing the reset button
     class ResetButtonPanel extends JPanel {
 
         ResetButtonPanel() {

@@ -9,7 +9,7 @@ import java.awt.Color;
 
 public class ChessModel {
 
-    public int moveStep = 0; // Step number of a move. A move has two steps; a selected piece and the destination
+    public int moveStep = 0; // Step number of a move. A move has two steps; a selected piece and destination
     private int[][] steps = new int[2][2]; // Array containing the selected piece coordinates and destination coordinates
     private ChessPiece[][] board = new ChessPiece[8][8];
     private ArrayList<int[]> currentPossibleDestinationsList = new ArrayList<int[]>();
@@ -35,10 +35,6 @@ public class ChessModel {
     public void setTurnColor(String turnColor) { this.turnColor = turnColor; }
     public void setBoard(ChessPiece[][] boardIn) { board = boardIn; }
     public void setGameStatus(String gameStatus) { this.gameStatus = gameStatus; }
-
-    public ChessModel() {
-        //board = ChessLib.initializeBoard(); // Board is initialized when the model is constructed
-    }
 
     public void addMove(int[] selectionCoordinates) {
 
@@ -76,13 +72,6 @@ public class ChessModel {
         if (isPlacementValid) {
 
             selectedPiece.isUnmoved = false;
-
-            //board[steps[0][0]][steps[0][1]].isUnmoved = false;
-
-            System.out.println(selectedPiece.getColor());
-
-            System.out.println(board[7][0].isUnmoved);
-            System.out.println(board[7][7].isUnmoved);
 
             ChessLib.playAudio("ChessData/pieceMoved.wav");
 
@@ -246,9 +235,6 @@ public class ChessModel {
 
         /* Checks the king-side rook to see if it can be castled with the selected king. 
         If the rook can be castled, its coordinates are added to the list */
-
-        //System.out.println("king:" + boardIn[KING_ROW_NUM][kingSideRookColIndex].isUnmoved);
-        //System.out.println("queen: " + boardIn[KING_ROW_NUM][queenSideRookColIndex].isUnmoved);
 
         if (boardIn[KING_ROW_NUM][kingColIndex+kingSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][kingColIndex+2*kingSideDirection].getType().equals("Empty") && boardIn[KING_ROW_NUM][kingSideRookColIndex].getType().equals("Rook") && boardIn[KING_ROW_NUM][kingSideRookColIndex].isUnmoved && !isKingInCheck(board, getTurnColor())) {
 
