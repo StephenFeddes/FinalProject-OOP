@@ -82,8 +82,6 @@ public class ChessView extends JFrame {
     public void setAvailableTilesList(ArrayList<int[]> currentAvailableTiles) { availableTilesList = currentAvailableTiles; }
 
     public ChessView() {
-        
-        //board = ChessLib.initializeBoard(); // 
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
